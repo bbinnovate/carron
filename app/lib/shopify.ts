@@ -21,7 +21,7 @@ export const createShopifyProduct =
       const response =
         await axios.post(
 
-          `https://${process.env.SHOPIFY_STORE_URL}/api/${process.env.SHOPIFY_API_VERSION}/products.json`,
+          `https://${process.env.SHOPIFY_STORE_URL}/admin/api/${process.env.SHOPIFY_API_VERSION}/products.json`,
 
           {
             product: {
@@ -94,7 +94,7 @@ export const createShopifyProduct =
       const previewResponse =
         await axios.get(
 
-          `https://${process.env.SHOPIFY_STORE_URL}/api/${process.env.SHOPIFY_API_VERSION}/products/${createdProduct.id}.json`,
+          `https://${process.env.SHOPIFY_STORE_URL}/admin/api/${process.env.SHOPIFY_API_VERSION}/products/${createdProduct.id}.json`,
 
           {
             headers: {

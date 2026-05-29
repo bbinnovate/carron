@@ -54,6 +54,15 @@ export default function UploadForm() {
   const [currentPage, setCurrentPage] =
   useState(1);
 
+
+const [selectedProducts, setSelectedProducts] =
+  useState<string[]>([]);
+
+const [bulkSyncLoading, setBulkSyncLoading] =
+  useState(false);
+
+
+
   const fetchProducts =
   async () => {
 
@@ -102,11 +111,20 @@ const handleUpload = (
 ) => {
 
   const files =
-    Array.from(
-      e.target.files || []
-    );
+  Array.from(
+    e.target.files || []
+  ).slice(0, 4);
 
-  if (!files.length) return;
+if (
+  files.length > 4
+) {
+
+  setError(
+    "You can upload maximum 4 images only."
+  );
+
+  return;
+}
 
   setSelectedFiles(files);
 
@@ -254,6 +272,44 @@ const handleShopifySync =
 };
 
 
+const handleBulkShopifySync =
+  async () => {
+
+    try {
+
+      setBulkSyncLoading(true);
+
+      for (const productId of selectedProducts) {
+
+        await axios.post(
+          "/api/shopify-sync",
+          {
+            productId,
+          }
+        );
+      }
+
+      await fetchProducts();
+
+      setSelectedProducts([]);
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert(
+        "Bulk Shopify sync failed"
+      );
+
+    } finally {
+
+      setBulkSyncLoading(false);
+    }
+};
+
+
+
+
 
   return (
 
@@ -264,11 +320,11 @@ const handleShopifySync =
         {/* HEADER */}
         <div className="text-center mb-12">
 
-          <h1 className="text-5xl font-bold mb-4">
+          <h1 className="text-5xl font-bold mb-4 title-highlight">
             AI Product Generator
           </h1>
 
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+          <p className="text-lg subtitle-highlight max-w-2xl mx-auto">
             Upload any product image and
             generate SEO content,
             descriptions, titles,
@@ -283,7 +339,7 @@ const handleShopifySync =
     bg-gray-50
     border
     border-gray-200
-    rounded-[30px]
+    rounded-[10px]
     p-4
     md:p-8
     shadow-sm
@@ -298,7 +354,7 @@ const handleShopifySync =
       border-2
       border-dashed
       border-gray-300
-      rounded-3xl
+      rounded-[10px]
       px-6
       py-12
       md:px-10
@@ -309,7 +365,7 @@ const handleShopifySync =
       justify-center
       cursor-pointer
       transition
-      hover:border-black
+      hover:border-[var(--highlight)]
       hover:bg-white
       text-center
     "
@@ -322,7 +378,7 @@ const handleShopifySync =
         md:w-20
         md:h-20
         rounded-full
-        bg-black
+        bg-[var(--highlight)]
         text-white
         flex
         items-center
@@ -339,30 +395,31 @@ const handleShopifySync =
         text-2xl
         md:text-3xl
         font-semibold
+        title-highlight
         mb-3
       "
     >
-      Upload Product Images
+     Upload Raw Images
     </h3>
 
     <p
       className="
-        text-gray-500
+        subtitle-highlight
         text-sm
         md:text-base
       "
     >
-      Supports PNG, JPG, WEBP
+     Supports PNG, JPG, and WEBP. Upload up to 4 images at a time for a single product.
     </p>
 
     <input
-      id="fileUpload"
-      type="file"
-      multiple
-      accept="image/*"
-      onChange={handleUpload}
-      className="hidden"
-    />
+  id="fileUpload"
+  type="file"
+  multiple
+  accept="image/*"
+  onChange={handleUpload}
+  className="hidden"
+/>
 
   </label>
 
@@ -470,7 +527,7 @@ xl:grid-cols-10
     className="
       mt-10
       flex
-      flex-col
+      flex-row
       sm:flex-row
       items-center
       justify-center
@@ -487,7 +544,7 @@ xl:grid-cols-10
         bg-white
         border
         border-gray-200
-        rounded-2xl
+        rounded-[10px]
         px-6
         py-4
         min-w-[180px]
@@ -520,7 +577,7 @@ xl:grid-cols-10
         bg-white
         border
         border-gray-200
-        rounded-2xl
+        rounded-[10px]
         px-6
         py-4
         min-w-[180px]
@@ -555,12 +612,12 @@ xl:grid-cols-10
       <button
         onClick={handleGenerate}
         className="
-          bg-black
+          bg-[var(--highlight)]
           text-white
           px-8
           md:px-12
           py-4
-          rounded-2xl
+          rounded-[10px]
           font-semibold
           text-base
           md:text-lg
@@ -570,7 +627,7 @@ xl:grid-cols-10
           sm:w-auto
         "
       >
-        Generate AI Product
+      Start Generation
       </button>
 
     </div>
@@ -585,11 +642,11 @@ xl:grid-cols-10
 
       <div
         className="
-          bg-black
+          bg-[var(--highlight)]
           text-white
           px-8
           py-4
-          rounded-full
+          rounded-[10px]
           flex
           items-center
           gap-4
@@ -631,7 +688,7 @@ xl:grid-cols-10
         text-red-700
         px-5
         py-4
-        rounded-2xl
+        rounded-[10px]
       "
     >
 
@@ -680,7 +737,7 @@ xl:grid-cols-10
           bg-white
           border
           border-gray-200
-          rounded-[30px]
+          rounded-[10px]
           shadow-sm
           overflow-hidden
         "
@@ -689,23 +746,89 @@ xl:grid-cols-10
         {/* DESKTOP HEADER */}
 
         <div
-  className="
-    grid
-    lg:grid-cols-[80px_180px_600px_1fr_150px]
-    bg-black
-    text-white
-    px-6
-    py-5
-    font-semibold
-    rounded-t-[30px]
-  "
+
+className="
+  sticky
+  top-0
+  z-50
+  lg:grid
+   lg:grid-cols-[150px_250px_1.2fr_2fr]
+  bg-[var(--highlight)]
+  text-white
+  px-6
+  py-5
+  font-semibold
+  rounded-t-[10px]
+"
+
+
 >
 
   {/* MOBILE */}
 
-  <div className="flex items-center justify-center lg:hidden">
+<div
+  className="
+    flex
+    items-center
+    justify-between
+    gap-3
+    lg:hidden
+    w-full
+    flex-wrap
+  "
+>
+
+  <div
+    className="
+      text-left
+      font-semibold
+    "
+  >
     Products
   </div>
+
+  {selectedProducts.length > 0 && (
+
+    <div
+      className="
+        flex
+        justify-end
+      "
+    >
+
+      <button
+        onClick={handleBulkShopifySync}
+        disabled={bulkSyncLoading}
+        className="
+          bg-white
+          text-black
+          px-4
+          sm:px-6
+          py-2.5
+          sm:py-3
+          rounded-[10px]
+          font-semibold
+          hover:opacity-90
+          transition
+          text-sm
+          sm:text-base
+          whitespace-nowrap
+        "
+      >
+        {
+          bulkSyncLoading
+            ? "Syncing..."
+            : `Sync To Shopify (${selectedProducts.length})`
+        }
+      </button>
+
+    </div>
+
+  )}
+
+</div>
+
+
 
   {/* DESKTOP */}
 
@@ -727,9 +850,8 @@ xl:grid-cols-10
       Description
     </div>
 
-    <div className="hidden lg:block">
-      Action
-    </div>
+
+
 
   </>
 
@@ -754,7 +876,9 @@ xl:grid-cols-10
                     border-gray-200
 
                     lg:grid
-                    lg:grid-cols-[70px_120px_380px_minmax(250px,1fr)_220px]
+          lg:grid-cols-[100px_120px_1.2fr_2fr]
+
+
                     lg:gap-6
                     lg:px-6
                     lg:py-6
@@ -769,16 +893,97 @@ xl:grid-cols-10
 
                   {/* MOBILE SR */}
 
-                  <div
-                    className="
-                      lg:text-lg
-                      font-semibold
-                      text-sm
-                      text-gray-500
-                    "
-                  >
-                    #{index + 1}
-                  </div>
+       
+<div
+  className="
+    flex
+    items-center
+    gap-4
+  "
+>
+
+  <input
+    type="checkbox"
+
+    disabled={
+      item.syncedToShopify
+    }
+
+    checked={
+      selectedProducts.includes(
+        item.id || ""
+      )
+    }
+
+    onChange={(e) => {
+
+      if (
+        !item.id ||
+        item.syncedToShopify
+      ) return;
+
+      if (e.target.checked) {
+
+        setSelectedProducts([
+          ...selectedProducts,
+          item.id,
+        ]);
+
+      } else {
+
+        setSelectedProducts(
+          selectedProducts.filter(
+            (id) =>
+              id !== item.id
+          )
+        );
+      }
+    }}
+
+    className={`
+      w-5
+      h-5
+
+      ${
+        item.syncedToShopify
+
+          ? "cursor-not-allowed opacity-40"
+
+          : "cursor-pointer"
+      }
+    `}
+  />
+
+  <span
+    className="
+      text-lg
+      font-semibold
+    "
+  >
+    #{index + 1}
+  </span>
+
+  {/* {item.syncedToShopify && (
+
+    <span
+      className="
+        text-xs
+        bg-green-100
+        text-green-700
+        px-3
+        py-1
+        rounded-full
+        font-medium
+      "
+    >
+      Drafted
+    </span>
+
+  )} */}
+
+</div>
+
+
 
                   {/* IMAGE */}
 
@@ -800,7 +1005,7 @@ xl:grid-cols-10
                         h-28
                         lg:w-20
                         lg:h-30
-                        rounded-2xl
+                        rounded-[10px]
                         object-contain
                         border
                         border-gray-200
@@ -816,6 +1021,7 @@ xl:grid-cols-10
 
                     <h2
                       className="
+                      title-highlight
                         text-xl
                         lg:text-lg
                         font-semibold
@@ -834,12 +1040,12 @@ xl:grid-cols-10
 
                     <p
                       className="
-                        text-gray-600
+                        subtitle-highlight
                         leading-7
                         text-sm
                         lg:text-base
                         text-left
-                        line-clamp-5
+                        line-clamp-3
                       "
                     >
                       {item.description}
@@ -849,65 +1055,7 @@ xl:grid-cols-10
 
                   {/* ACTION */}
 
-                  <div
-                    className="
-                      flex
-                      flex-col
-                      gap-3
-                      w-full
-                    "
-                  >
-
-                    <button
-                      onClick={() =>
-                        handleShopifySync(
-                          item.id
-                        )
-                      }
-                      className="
-                        w-full
-                        bg-black
-                        text-white
-                        py-3
-                        rounded-2xl
-                        font-medium
-                        hover:opacity-90
-                        transition
-                      "
-                    >
-                      Sync To Shopify
-                    </button>
-
-                    {item.shopifyDraftLink && (
-
-                      <a
-                        href={
-                          item.shopifyDraftLink
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="
-                          flex
-                          items-center
-                          justify-center
-                          w-full
-                          border
-                          border-black
-                          text-center
-                          py-3
-                          rounded-2xl
-                          font-medium
-                          hover:bg-black
-                          hover:text-white
-                          transition
-                        "
-                      >
-                        Open Draft
-                      </a>
-
-                    )}
-
-                  </div>
+                 
 
                 </div>
 
@@ -931,7 +1079,7 @@ xl:grid-cols-10
                 className="
                   w-24
                   h-24
-                  rounded-full
+                  rounded-[10px]
                   bg-gray-100
                   flex
                   items-center
@@ -1000,7 +1148,7 @@ xl:grid-cols-10
       py-2
       border
       border-gray-300
-      rounded-xl
+      rounded-[10px]
       hover:bg-gray-100
       transition
       disabled:opacity-40
@@ -1028,14 +1176,14 @@ xl:grid-cols-10
         className={`
           px-5
           py-2
-          rounded-xl
+          rounded-[10px]
           transition
 
           ${
             currentPage ===
             index + 1
 
-              ? "bg-black text-white"
+              ? "bg-[var(--highlight)] text-white"
 
               : "border border-gray-300 hover:bg-gray-100"
           }
@@ -1064,7 +1212,7 @@ xl:grid-cols-10
       py-2
       border
       border-gray-300
-      rounded-xl
+      rounded-[10px]
       hover:bg-gray-100
       transition
       disabled:opacity-40
@@ -1133,7 +1281,7 @@ xl:grid-cols-10
 //           w-full
 //           aspect-square
 //           object-contain
-//           rounded-3xl
+//           rounded-[10px]
 //           border
 //           border-gray-200
 //         "
@@ -1394,7 +1542,7 @@ xl:grid-cols-10
 //               border-2
 //               border-dashed
 //               border-gray-300
-//               rounded-3xl
+//               rounded-[10px]
 //               p-14
 //               flex
 //               flex-col
@@ -1442,7 +1590,7 @@ xl:grid-cols-10
 //                   w-[210px]
 //                   h-[280px]
 //                   object-contain
-//                   rounded-3xl
+//                   rounded-[10px]
 //                   border
 //                   border-gray-200
 //                   shadow-sm
@@ -1514,7 +1662,7 @@ xl:grid-cols-10
 //           w-full
 //           aspect-square
 //           object-contain
-//           rounded-3xl
+//           rounded-[10px]
 //           border
 //           border-gray-200
 //         "

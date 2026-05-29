@@ -1,6 +1,4 @@
-
 import type { Metadata } from "next";
-
 import localFont from "next/font/local";
 
 import {
@@ -31,16 +29,19 @@ const alro = localFont({
 
 const familjenGrotesk =
   Familjen_Grotesk({
-
     subsets: ["latin"],
-
-    variable:
-      "--font-familjen",
+    variable: "--font-familjen",
   });
 
 export const metadata: Metadata = {
   title: "Carron Clothing",
   description: "AI Product Generator",
+
+  icons: {
+    icon: "/fav.avif",
+    shortcut: "/fav.avif",
+    apple: "/fav.avif",
+  },
 };
 
 export default function RootLayout({
@@ -68,4 +69,3 @@ export default function RootLayout({
     </html>
   );
 }
-
