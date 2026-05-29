@@ -10,6 +10,8 @@ import {
 import {
   collection,
   getDocs,
+  deleteDoc,
+  doc,
   orderBy,
   query,
 } from "firebase/firestore";
@@ -35,6 +37,7 @@ export default function UploadForm() {
 
   const [loading, setLoading] =
     useState(false);
+    
 
  const [products, setProducts] =
   useState<ProductData[]>([]);
@@ -60,6 +63,21 @@ const [selectedProducts, setSelectedProducts] =
 
 const [bulkSyncLoading, setBulkSyncLoading] =
   useState(false);
+
+
+  const [previewModal, setPreviewModal] =
+  useState("");
+
+const nonDraftProducts =
+  products.filter(
+    (product) =>
+      !product.syncedToShopify
+  );
+
+const allSelected =
+  nonDraftProducts.length > 0 &&
+  selectedProducts.length ===
+    nonDraftProducts.length;
 
 
 
@@ -309,7 +327,85 @@ const handleBulkShopifySync =
 
 
 
+const handleSelectAll =
+  () => {
 
+    if (allSelected) {
+
+      setSelectedProducts([]);
+
+    } else {
+
+      const allIds =
+        nonDraftProducts
+          .map(
+            (product) =>
+              product.id
+          )
+          .filter(Boolean) as string[];
+
+      setSelectedProducts(allIds);
+    }
+};
+
+
+
+const handleDeleteAllProducts =
+  async () => {
+
+    const confirmDelete =
+      window.confirm(
+        "Are you sure you want to delete all products?"
+      );
+
+    if (!confirmDelete) return;
+
+    try {
+
+      const snapshot =
+        await getDocs(
+          collection(
+            db,
+            "products"
+          )
+        );
+
+      const deletePromises =
+        snapshot.docs.map(
+          async (product) => {
+
+            await deleteDoc(
+              doc(
+                db,
+                "products",
+                product.id
+              )
+            );
+          }
+        );
+
+      await Promise.all(
+        deletePromises
+      );
+
+      setProducts([]);
+
+      setSelectedProducts([]);
+
+      alert(
+        "All products deleted successfully"
+      );
+
+    } catch (error: any) {
+
+      console.log(error);
+
+      alert(
+        error?.message ||
+        "Delete failed"
+      );
+    }
+};
 
   return (
 
@@ -409,7 +505,7 @@ const handleBulkShopifySync =
         md:text-base
       "
     >
-     Supports PNG, JPG, and WEBP. Upload up to 4 images at a time for a single product.
+  Supports PNG, JPG, and WEBP. Upload up to 4 images at a time for a single product. Each product generation can take up to 2–3 minutes.
     </p>
 
     <input
@@ -632,9 +728,6 @@ xl:grid-cols-10
 
     </div>
 
-  {/* )} */}
-
-  {/* LOADING */}
 
   {loading && (
 
@@ -701,7 +794,32 @@ xl:grid-cols-10
 </div>
 
 
+{/* <div
+  className="
+    flex
+    items-center
+    justify-end
+    mb-6
+  "
+>
 
+  <button
+    onClick={handleDeleteAllProducts}
+    className="
+      bg-red-600
+      text-white
+      px-6
+      py-3
+      rounded-[10px]
+      font-semibold
+      hover:bg-red-700
+      transition
+    "
+  >
+    Delete All Products
+  </button>
+
+</div> */}
 
         {/* RESULT */}
 
@@ -739,7 +857,7 @@ xl:grid-cols-10
           border-gray-200
           rounded-[10px]
           shadow-sm
-          overflow-hidden
+          overflow-visible
         "
       >
 
@@ -748,8 +866,10 @@ xl:grid-cols-10
       <div
   className="
     sticky
-    top-0
-    z-50
+top-0
+left-0
+right-0
+z-50
     hidden
     lg:grid
     lg:grid-cols-[150px_280px_1.2fr_2fr_250px]
@@ -757,7 +877,7 @@ xl:grid-cols-10
     bg-[var(--highlight)]
     text-white
     px-8
-    py-5
+    py-3
     font-semibold
     rounded-t-[10px]
   "
@@ -766,9 +886,61 @@ xl:grid-cols-10
 
   
 
-  <div>
-    Sr No
+<div
+  className="
+    flex
+    items-center
+    gap-4
+  "
+>
+
+  <input
+    type="checkbox"
+    checked={allSelected}
+    onChange={handleSelectAll}
+    className="
+      w-5
+      h-5
+      cursor-pointer
+    "
+  />
+
+  <div
+    className="
+      flex
+      items-center
+      gap-1
+      whitespace-nowrap
+    "
+  >
+
+    <span
+      className="
+        font-semibold
+      "
+    >
+      All
+    </span>
+
+    <span
+      className="
+        opacity-50
+      "
+    >
+      |
+    </span>
+
+    <span
+      className="
+        font-semibold
+      "
+    >
+      Sr No
+    </span>
+
   </div>
+
+</div>
 
   <div>
     Images
@@ -819,42 +991,100 @@ xl:grid-cols-10
 
 <div
 
+className="
+  sticky
+  top-0
+  left-0
+  right-0
+  z-50
+
+  bg-[var(--highlight)]
+  text-white
+
+  px-4
+  py-3
+
+  rounded-t-[10px]
+
+  flex
+  items-center
+  justify-between
+
+  lg:hidden
+  w-full
+"
+>
+
+<div
   className="
-   sticky
-    top-0
-    z-50
-    bg-[var(--highlight)]
-    text-white
-    px-8
-    py-5
-    font-semibold
-    rounded-t-[10px]
-
-
-
-
-
-
     flex
     items-center
-    justify-between
-    gap-3
-    lg:hidden
-    w-full
-    flex-wrap
+    gap-4
   "
 >
 
+  {/* CHECKBOX */}
+
+  <input
+    type="checkbox"
+    checked={allSelected}
+    onChange={handleSelectAll}
+    className="
+      w-5
+      h-5
+      cursor-pointer
+      shrink-0
+    "
+  />
+
+  {/* TEXT */}
+
   <div
     className="
-      text-left
-      font-semibold
-      text-2xl
-        md:text-3xl
+      flex
+      items-center
+      gap-3
+      whitespace-nowrap
     "
   >
-    Products
+
+    <span
+      className="
+        font-semibold
+        text-base
+      "
+    >
+      All
+    </span>
+
+    <span
+      className="
+        opacity-40
+      "
+    >
+      |
+    </span>
+
+   
+ 
+
+    <div
+      className="
+        text-left
+        font-semibold
+        text-xl
+        md:text-2xl
+        leading-none
+      "
+    >
+      Products
+    </div>
+
   </div>
+
+</div>
+
+
 
   {selectedProducts.length > 0 && (
 
@@ -872,7 +1102,7 @@ xl:grid-cols-10
           bg-white
           text-black
           px-4
-          sm:px-6
+          sm:px-3
           py-2.5
           sm:py-3
           rounded-[10px]
@@ -1036,10 +1266,15 @@ xl:grid-cols-10
                   >
 
                     <img
-                      src={
-                        item.generatedModelImages?.[0] ||
-                        "/placeholder.png"
-                      }
+  onClick={() =>
+    setPreviewModal(
+      item.generatedModelImages?.[0] || ""
+    )
+  }
+  src={
+    item.generatedModelImages?.[0] ||
+    "/placeholder.png"
+  }
                       alt=""
                       className="
                         w-24
@@ -1050,6 +1285,9 @@ xl:grid-cols-10
                         object-contain
                         border
                         border-gray-200
+                        cursor-pointer
+hover:scale-105
+transition
                         shrink-0
                       "
                     />
@@ -1149,7 +1387,7 @@ xl:grid-cols-10
                   leading-7
                 "
               >
-                Generated products from Firebase
+                Generated products
                 will appear here.
               </p>
 
@@ -1275,7 +1513,37 @@ xl:grid-cols-10
 
 </div>
 
+{previewModal && (
 
+  <div
+    onClick={() =>
+      setPreviewModal("")
+    }
+    className="
+      fixed
+      inset-0
+      z-[999]
+      bg-black/80
+      flex
+      items-center
+      justify-center
+      p-5
+    "
+  >
+
+    <img
+      src={previewModal}
+      alt=""
+      className="
+        max-w-full
+        max-h-full
+        rounded-[20px]
+      "
+    />
+
+  </div>
+
+)}
 
 
 
