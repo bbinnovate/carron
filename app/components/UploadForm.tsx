@@ -703,70 +703,72 @@ xl:grid-cols-10
 
   {/* {previews.length > 0 && !loading && ( */}
 
-    <div className="flex justify-center mt-10">
+<div className="flex justify-center mt-10">
 
-      <button
-        onClick={handleGenerate}
-        className="
-          bg-[var(--highlight)]
-          text-white
-          px-8
-          md:px-12
-          py-4
-          rounded-[10px]
-          font-semibold
-          text-base
-          md:text-lg
-          hover:opacity-90
-          transition
-          w-full
-          sm:w-auto
-        "
-      >
-      Start Generation
-      </button>
+  <button
+    onClick={handleGenerate}
+    disabled={loading}
+    className="
+      bg-[var(--highlight)]
+      text-white
 
-    </div>
+      px-8
+      md:px-12
 
+      py-4
 
-  {loading && (
+      rounded-[10px]
 
-    <div className="flex justify-center mt-10">
+      font-semibold
+      text-base
+      md:text-lg
+
+      hover:opacity-90
+      transition
+
+      w-full
+      sm:w-auto
+
+      disabled:opacity-70
+      disabled:cursor-not-allowed
+
+      flex
+      items-center
+      justify-center
+      gap-4
+    "
+  >
+
+    {loading && (
 
       <div
         className="
-          bg-[var(--highlight)]
-          text-white
-          px-8
-          py-4
-          rounded-[10px]
-          flex
-          items-center
-          gap-4
+          w-5
+          h-5
+          border-2
+          border-white
+          border-t-transparent
+          rounded-full
+          animate-spin
+          shrink-0
         "
-      >
+      />
 
-        <div
-          className="
-            w-5
-            h-5
-            border-2
-            border-white
-            border-t-transparent
-            rounded-full
-            animate-spin
-          "
-        />
+    )}
 
-        <p className="font-medium">
-          Generating Product...
-        </p>
+    <span>
 
-      </div>
+      {
+        loading
+          ? "Generating Product..."
+          : "Start Generation"
+      }
 
-    </div>
+    </span>
 
-  )}
+  </button>
+
+</div> 
 
   {/* ERROR */}
 
