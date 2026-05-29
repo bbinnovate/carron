@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import SmoothScroll from "./components/SmoothScroll";
 
 import {
   Familjen_Grotesk,
@@ -62,7 +63,10 @@ export default function RootLayout({
 
       <body>
 
-        {children}
+         <SmoothScroll>
+          {children}
+        </SmoothScroll>
+
 
       </body>
 
