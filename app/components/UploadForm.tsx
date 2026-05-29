@@ -745,29 +745,96 @@ xl:grid-cols-10
 
         {/* DESKTOP HEADER */}
 
-        <div
-
-className="
-  sticky
-  top-0
-  z-50
-  lg:grid
-   lg:grid-cols-[150px_250px_1.2fr_2fr]
-  bg-[var(--highlight)]
-  text-white
-  px-6
-  py-5
-  font-semibold
-  rounded-t-[10px]
-"
-
-
+      <div
+  className="
+    sticky
+    top-0
+    z-50
+    hidden
+    lg:grid
+    lg:grid-cols-[150px_280px_1.2fr_2fr_250px]
+    items-center
+    bg-[var(--highlight)]
+    text-white
+    px-8
+    py-5
+    font-semibold
+    rounded-t-[10px]
+  "
 >
 
-  {/* MOBILE */}
+
+  
+
+  <div>
+    Sr No
+  </div>
+
+  <div>
+    Images
+  </div>
+
+  <div>
+    Title
+  </div>
+
+  <div>
+    Description
+  </div>
+
+  <div className="flex justify-end">
+
+    {selectedProducts.length > 0 && (
+
+      <button
+        onClick={handleBulkShopifySync}
+        disabled={bulkSyncLoading}
+        className="
+          bg-white
+          text-black
+          px-6
+          py-3
+          rounded-[10px]
+          font-semibold
+          hover:opacity-90
+          transition
+          whitespace-nowrap
+        "
+      >
+        {
+          bulkSyncLoading
+            ? "Syncing..."
+            : `Sync (${selectedProducts.length})`
+        }
+      </button>
+
+    )}
+
+  </div>
+
+</div>
+
+
+
 
 <div
+
   className="
+   sticky
+    top-0
+    z-50
+    bg-[var(--highlight)]
+    text-white
+    px-8
+    py-5
+    font-semibold
+    rounded-t-[10px]
+
+
+
+
+
+
     flex
     items-center
     justify-between
@@ -782,6 +849,8 @@ className="
     className="
       text-left
       font-semibold
+      text-2xl
+        md:text-3xl
     "
   >
     Products
@@ -828,34 +897,6 @@ className="
 
 </div>
 
-
-
-  {/* DESKTOP */}
-
-  <>
-
-    <div className="hidden lg:block">
-      Sr No
-    </div>
-
-    <div className="hidden lg:block">
-      Images
-    </div>
-
-    <div className="hidden lg:block">
-      Title
-    </div>
-
-    <div className="hidden lg:block">
-      Description
-    </div>
-
-
-
-
-  </>
-
-</div>
 
         {/* TABLE BODY */}
 
