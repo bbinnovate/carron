@@ -15,6 +15,8 @@ import {
   orderBy,
   query,
 } from "firebase/firestore";
+import { characters }
+from "../lib/characters";
 
 import {
   useEffect,
@@ -53,6 +55,9 @@ export default function UploadForm() {
 
     const [selectedGender, setSelectedGender] =
   useState("male");
+
+  const [selectedCharacter, setSelectedCharacter] =
+  useState("");
 
   const [currentPage, setCurrentPage] =
   useState(1);
@@ -197,6 +202,9 @@ const handleGenerate =
   uploadedImages[0],
             gender:
               selectedGender,
+              
+              characterImage:
+  selectedCharacter,
           }
         );
 
@@ -696,6 +704,128 @@ xl:grid-cols-10
       </span>
 
     </label>
+
+
+
+
+    {/* CHARACTER SELECTION */}
+
+<div className="mt-10">
+
+  <div className="text-center mb-6">
+
+    <h3
+      className="
+        text-2xl
+        md:text-3xl
+        font-semibold
+        title-highlight
+        mb-2
+      "
+    >
+      Select Character
+    </h3>
+
+    <p
+      className="
+        subtitle-highlight
+        text-sm
+        md:text-base
+      "
+    >
+      Choose the AI model character
+      you want to use.
+    </p>
+
+  </div>
+
+  <div
+    className="
+      grid
+      grid-cols-2
+      sm:grid-cols-3
+      md:grid-cols-4
+      gap-4
+    "
+  >
+
+    {characters[
+      selectedGender as
+      "male" | "female"
+    ].map((character) => (
+
+      <button
+        key={character.id}
+        type="button"
+        onClick={() =>
+          setSelectedCharacter(
+            character.image
+          )
+        }
+        className={`
+          relative
+          overflow-hidden
+          rounded-[14px]
+          border-2
+          transition
+          aspect-[3/4]
+          bg-white
+
+          ${
+            selectedCharacter ===
+            character.image
+
+              ? "border-[var(--highlight)] scale-[1.02]"
+
+              : "border-gray-200 hover:border-gray-400"
+          }
+        `}
+      >
+
+        <img
+          src={character.image}
+          alt=""
+          className="
+            w-full
+            h-full
+            object-cover
+          "
+        />
+
+        {/* SELECTED BADGE */}
+
+        {selectedCharacter ===
+          character.image && (
+
+          <div
+            className="
+              absolute
+              top-3
+              right-3
+              w-7
+              h-7
+              rounded-full
+              bg-[var(--highlight)]
+              text-white
+              flex
+              items-center
+              justify-center
+              text-sm
+              font-bold
+            "
+          >
+            ✓
+          </div>
+
+        )}
+
+      </button>
+
+    ))}
+
+  </div>
+
+</div>
 
   </div>
 

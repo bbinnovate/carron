@@ -10,10 +10,7 @@ const sleep = (
 
 export const generateModelImage =
   async (
-    prompt: string,
-    gender: string,
-    imageUrl: string
-  ) => {
+prompt: string, gender: string, imageUrl: string, characterImage: any  ) => {
 
     const angles = [
       "front pose",
@@ -31,39 +28,39 @@ export const generateModelImage =
 
         try {
 
-          const enhancedPrompt = `
+         const enhancedPrompt = `
+A single full-body ${gender === "female" ? "female" : "male"} fashion model on a pure white seamless studio background.
 
-Create ONE realistic ecommerce fashion model image.
+IDENTITY (use reference character exactly):
+- SAME face, facial features, and expression
+- SAME skin tone and texture
+- SAME hairstyle and hair color
+- SAME body type and proportions
+- DO NOT alter or replace the person in any way
 
-IMPORTANT: is 1 r
-- 1:1 square ratio
-- ultra realistic
-- premium luxury ecommerce photoshoot
-- preserve EXACT clothing design
-- preserve EXACT colors
-- preserve EXACT embroidery
-- preserve EXACT fashion details
-- DO NOT change the outfit
+CLOTHING (use reference product image exactly):
+- SAME outfit — do not swap, replace, or reimagine
+- SAME colors — do not shift, brighten, or alter
+- SAME embroidery, prints, and surface patterns
+- SAME neckline, sleeve style, and fit
+- SAME trims, borders, pockets, and all details
+- Garment must appear naturally worn on the model's body
 
-Use a ${
-  gender === "female"
-    ? "female"
-    : "male"
-} fashion model.
-
-Pose:
+POSE:
 ${angle}
 
-Scene:
-- luxury studio
-- cinematic lighting
-- premium ecommerce photography
-- realistic skin texture
-
-Product details:
- 
-
+PHOTOGRAPHY:
+- 1:1 square aspect ratio
+- Full-body shot, head to toe
+- Pure white seamless background — no texture, no gradient, no shadows, no props
+- Even, bright studio lighting — shadow-free
+- Sharp focus, high resolution
+- Realistic skin texture and natural appearance
+- Premium luxury ecommerce photoshoot quality
 `;
+
+
+ 
 
           const response =
             await axios.post(
@@ -74,6 +71,18 @@ Product details:
                 contents: [
                   {
                     parts: [
+
+                       // CHARACTER REFERENCE
+
+  {
+    fileData: {
+      mimeType:
+        "image/jpeg",
+
+      fileUri:
+        characterImage,
+    },
+  },
 
                       // PRODUCT IMAGE
 

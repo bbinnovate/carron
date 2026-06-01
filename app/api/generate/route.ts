@@ -31,9 +31,10 @@ export async function POST(
     const body =
       await req.json();
 
-    const {
+const {
   imageUrl,
   gender,
+  characterImage,
 } = body;
 
     // VALIDATION
@@ -135,7 +136,8 @@ try {
     await generateModelImage(
       parsed.imagePrompt,
       gender,
-      imageUrl
+      imageUrl,
+      characterImage
     );
 
   console.log(
