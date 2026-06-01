@@ -39,8 +39,9 @@ export default function UploadForm() {
 
   const [loading, setLoading] =
     useState(false);
-    
-
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
+const [selectedDeleteProducts, setSelectedDeleteProducts] =
+  useState<string[]>([]);
  const [products, setProducts] =
   useState<ProductData[]>([]);
 
@@ -56,8 +57,14 @@ export default function UploadForm() {
     const [selectedGender, setSelectedGender] =
   useState("male");
 
-  const [selectedCharacter, setSelectedCharacter] =
+  const [backgroundType, setBackgroundType] =
+  useState("default");
+
+const [selectedBgImage, setSelectedBgImage] =
   useState("");
+
+  const [selectedBgColor, setSelectedBgColor] =
+  useState("#AAB883");
 
   const [currentPage, setCurrentPage] =
   useState(1);
@@ -202,9 +209,16 @@ const handleGenerate =
   uploadedImages[0],
             gender:
               selectedGender,
-              
-              characterImage:
-  selectedCharacter,
+
+             backgroundType,
+backgroundColor:
+  selectedBgColor,
+
+backgroundImage:
+  selectedBgImage,
+
+
+    
           }
         );
 
@@ -415,6 +429,70 @@ const handleDeleteAllProducts =
     }
 };
 
+
+const handleDeleteSelectedProducts =
+  async () => {
+
+    if (
+      selectedProducts.length === 0
+    ) {
+      alert(
+        "Please select products first"
+      );
+
+      return;
+    }
+
+    const confirmDelete =
+      window.confirm(
+        `Are you sure you want to delete ${selectedProducts.length} selected products?`
+      );
+
+    if (!confirmDelete) return;
+
+    try {
+
+      const deletePromises =
+        selectedProducts.map(
+          async (productId) => {
+
+            await deleteDoc(
+              doc(
+                db,
+                "products",
+                productId
+              )
+            );
+          }
+        );
+
+      await Promise.all(
+        deletePromises
+      );
+
+      await fetchProducts();
+
+      setSelectedProducts([]);
+
+      alert(
+        "Selected products deleted successfully"
+      );
+
+    } catch (error: any) {
+
+      console.log(error);
+
+      alert(
+        error?.message ||
+        "Delete failed"
+      );
+    }
+};
+
+  function setSelectedCharacter(image: string): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
 
     <div className="container mx-auto px-4 py-4 bg-white">
@@ -424,15 +502,12 @@ const handleDeleteAllProducts =
         {/* HEADER */}
         <div className="text-center mb-12">
 
-          <h1 className="text-5xl font-bold mb-4 title-highlight">
-            AI Product Generator
-          </h1>
+          <h1 className="text-4xl lg:text-5xl font-bold lg:mb-4 mb-2 title-highlight">
+  AI Product Generator
+</h1>
 
-          <p className="text-lg subtitle-highlight max-w-2xl mx-auto">
-            Upload any product image and
-            generate SEO content,
-            descriptions, titles,
-            meta data, and AI model visuals.
+          <p className="subtitle subtitle-highlight max-w-2xl mx-auto">
+            Fully automated product upload workflow
           </p>
 
         </div>
@@ -496,9 +571,7 @@ const handleDeleteAllProducts =
 
     <h3
       className="
-        text-2xl
-        md:text-3xl
-        font-semibold
+       title 
         title-highlight
         mb-3
       "
@@ -506,15 +579,27 @@ const handleDeleteAllProducts =
      Upload Raw Images
     </h3>
 
-    <p
-      className="
-        subtitle-highlight
-        text-sm
-        md:text-base
-      "
-    >
-  Supports PNG, JPG, and WEBP. Upload up to 4 images at a time for a single product. Each product generation can take up to 2–3 minutes.
-    </p>
+<p
+  className="
+    subtitle-highlight
+    subtitle 
+    flex
+    flex-col
+    gap-1
+  "
+>
+  <span>
+    Supports PNG, JPG, and WEBP.
+  </span>
+
+  <span>
+    Upload up to 4 images at a time for a single product.
+  </span>
+
+  {/* <span>
+    Each product generation can take up to 2–3 minutes.
+  </span> */}
+</p>
 
     <input
   id="fileUpload"
@@ -710,80 +795,58 @@ xl:grid-cols-10
 
     {/* CHARACTER SELECTION */}
 
-<div className="mt-10">
 
-  <div className="text-center mb-6">
-
-    <h3
-      className="
-        text-2xl
-        md:text-3xl
-        font-semibold
-        title-highlight
-        mb-2
-      "
-    >
-      Select Character
-    </h3>
-
-    <p
-      className="
-        subtitle-highlight
-        text-sm
-        md:text-base
-      "
-    >
-      Choose the AI model character
-      you want to use.
-    </p>
 
   </div>
 
+{/* BG IMAGE PICKER */}
+
+{backgroundType === "image" && (
+
   <div
     className="
-      grid
-      grid-cols-2
-      sm:grid-cols-3
-      md:grid-cols-4
-      gap-4
+      mt-8
+      flex
+      items-center
+      justify-center
+      gap-5
+      flex-wrap
     "
   >
 
-    {characters[
-      selectedGender as
-      "male" | "female"
-    ].map((character) => (
+    {[
+      "https://firebasestorage.googleapis.com/v0/b/bombay-blokes-4c284.firebasestorage.app/o/jk-diamonds%2Fdownload%20(3).jpeg?alt=media&token=8dc81055-a27c-42a3-a94e-6ff13744b464",
+      "https://firebasestorage.googleapis.com/v0/b/bombay-blokes-4c284.firebasestorage.app/o/jk-diamonds%2Fdownload%20(2).jpeg?alt=media&token=981c862e-48c9-4279-8f7b-74438b9c9cfd",
+    ].map((bg) => (
 
       <button
-        key={character.id}
+        key={bg}
         type="button"
         onClick={() =>
-          setSelectedCharacter(
-            character.image
-          )
+          setSelectedBgImage(bg)
         }
         className={`
           relative
+          w-40
+          aspect-[5/6]
+          rounded-[10px]
           overflow-hidden
-          rounded-[14px]
-          border-2
+          cursor-pointer
+          border-4
           transition
-          aspect-[3/4]
-          bg-white
 
           ${
-            selectedCharacter ===
-            character.image
+            selectedBgImage === bg
 
-              ? "border-[var(--highlight)] scale-[1.02]"
+              ? "border-black scale-105"
 
-              : "border-gray-200 hover:border-gray-400"
+              : "border-transparent"
           }
         `}
       >
 
         <img
-          src={character.image}
+          src={bg}
           alt=""
           className="
             w-full
@@ -792,52 +855,172 @@ xl:grid-cols-10
           "
         />
 
-        {/* SELECTED BADGE */}
-
-        {selectedCharacter ===
-          character.image && (
-
-          <div
-            className="
-              absolute
-              top-3
-              right-3
-              w-7
-              h-7
-              rounded-full
-              bg-[var(--highlight)]
-              text-white
-              flex
-              items-center
-              justify-center
-              text-sm
-              font-bold
-            "
-          >
-            ✓
-          </div>
-
-        )}
-
       </button>
 
     ))}
 
   </div>
 
-</div>
+)}
+  {/* GENERATE BUTTON */}
+
+
+  {/* BACKGROUND COLOR */}
+{/* BACKGROUND TYPE */}
+
+<div className="mt-10">
+
+  <div className="text-center mb-5">
+
+    <h3
+      className="
+        text-2xl
+        md:text-3xl
+        font-semibold
+        title-highlight
+        
+        mb-2
+      "
+    >
+      Background Style
+    </h3>
 
   </div>
 
-  {/* GENERATE BUTTON */}
+  <div
+    className="
+      flex
+      flex-wrap
+      items-center
+      justify-center
+      gap-4
+    "
+  >
+
+    {/* DEFAULT */}
+
+    <button
+      type="button"
+      onClick={() =>
+        setBackgroundType("default")
+      }
+      className={`
+        px-6
+        py-4
+        rounded-[10px]
+        border
+        transition
+        cursor-pointer
+
+        ${
+          backgroundType === "default"
+
+            ? "bg-[var(--highlight)] text-white border-black"
+
+            : "bg-white border-gray-200"
+        }
+      `}
+    >
+      Default AI BG
+    </button>
+
+    {/* SOLID */}
+
+  <button
+  type="button"
+  onClick={() =>
+    setBackgroundType("solid")
+  }
+  className={`
+    px-6
+    py-4
+    rounded-[10px]
+    border
+    transition
+    cursor-pointer
+    flex
+    items-center
+    gap-3
+
+    ${
+      backgroundType === "solid"
+
+        ? "bg-[var(--highlight)] text-white border-black"
+
+        : "bg-white border-gray-200"
+    }
+  `}
+>
+
+  <div
+    className="
+      w-5
+      h-5
+      rounded-full
+      border
+      border-white/30
+      shrink-0
+      cursor-pointer
+    "
+    style={{
+      background:
+        "#AAB883",
+    }}
+  />
+
+  <span>
+    Solid Color BG
+  </span>
+
+</button>
+
+    {/* BG IMAGE */}
+
+    <button
+      type="button"
+      onClick={() =>
+        setBackgroundType("image")
+      }
+      className={`
+        px-6
+        py-4
+        rounded-[10px]
+        border
+        transition
+        cursor-pointer
+
+        ${
+          backgroundType === "image"
+
+            ? "bg-[var(--highlight)] text-white border-black"
+
+            : "bg-white border-gray-200"
+        }
+      `}
+    >
+      Background Image
+    </button>
+
+  </div>
+
+</div>
 
   {/* {previews.length > 0 && !loading && ( */}
 
-<div className="flex justify-center mt-10">
+<div
+  className="
+    flex
+    flex-col
+    items-center
+    gap-4
+    mt-10
+  "
+>
 
   <button
     onClick={handleGenerate}
     disabled={loading}
+
     className="
       bg-[var(--highlight)]
       text-white
@@ -898,8 +1081,17 @@ xl:grid-cols-10
 
   </button>
 
-</div> 
+  <p
+    className="
+      subtitle-highlight
+      subtitle
+      text-center
+    "
+  >
+    Each product generation can take up to 2–3 minutes.
+  </p>
 
+</div>
   {/* ERROR */}
 
   {error && (
@@ -952,6 +1144,10 @@ xl:grid-cols-10
   </button>
 
 </div> */}
+
+
+
+
 
         {/* RESULT */}
 
@@ -1087,6 +1283,58 @@ z-50
   </div>
 
   <div className="flex justify-end">
+
+
+{/* {selectedDeleteProducts.length > 0 && (
+
+  <button
+    onClick={
+      handleDeleteSelectedProducts
+    }
+
+    className="
+      bg-red-600
+      text-white
+      px-6
+      py-3
+      rounded-[10px]
+      font-semibold
+      hover:bg-red-700
+      transition
+      whitespace-nowrap
+    "
+  >
+    Delete (
+      {selectedDeleteProducts.length}
+    )
+  </button>
+
+)} */}
+
+
+
+  {/* {selectedProducts.length > 0 && (
+
+    <button
+      onClick={
+        handleDeleteSelectedProducts
+      }
+      className="
+        bg-red-600
+        text-white
+        px-6
+        py-3
+        rounded-[10px]
+        font-semibold
+        hover:bg-red-700
+        transition
+        whitespace-nowrap
+      "
+    >
+      Delete ({selectedProducts.length})
+    </button>
+
+  )} */}
 
     {selectedProducts.length > 0 && (
 
@@ -1299,7 +1547,8 @@ className="
        
 <div
   className="
-    flex
+    flex 
+    flex-row
     items-center
     gap-4
   "
@@ -1308,9 +1557,7 @@ className="
   <input
     type="checkbox"
 
-    disabled={
-      item.syncedToShopify
-    }
+  
 
     checked={
       selectedProducts.includes(
@@ -1389,82 +1636,209 @@ className="
 </div>
 
 
+{/* delect checker */}
+{/* <input
+  type="checkbox"
+
+  checked={
+    selectedDeleteProducts.includes(
+      item.id || ""
+    )
+  }
+
+  onChange={(e) => {
+
+    if (!item.id) return;
+
+    if (e.target.checked) {
+
+      setSelectedDeleteProducts([
+        ...selectedDeleteProducts,
+        item.id,
+      ]);
+
+    } else {
+
+      setSelectedDeleteProducts(
+        selectedDeleteProducts.filter(
+          (id) =>
+            id !== item.id
+        )
+      );
+    }
+  }}
+
+  className="
+    w-5
+    h-5
+    cursor-pointer
+    accent-red-600
+  "
+/> */}
 
                   {/* IMAGE */}
 
-                  <div
-                    className="
-                      flex
-                      justify-start
-                    "
-                  >
+                  {/* IMAGE */}
 
-                    <img
-  onClick={() =>
-    setPreviewModal(
-      item.generatedModelImages?.[0] || ""
-    )
-  }
-  src={
-    item.generatedModelImages?.[0] ||
-    "/placeholder.png"
-  }
-                      alt=""
-                      className="
-                        w-24
-                        h-28
-                        lg:w-20
-                        lg:h-30
-                        rounded-[10px]
-                        object-contain
-                        border
-                        border-gray-200
-                        cursor-pointer
-hover:scale-105
-transition
-                        shrink-0
-                      "
-                    />
+<div
+  className="
+    flex
+    gap-4
+    items-start
 
-                  </div>
+    lg:block
+  "
+>
 
-                  {/* TITLE */}
+  <div
+    className="
+      flex
+      justify-start
+      shrink-0
+    "
+  >
 
-                  <div>
+    <img
+      onClick={() =>
+        setPreviewModal(
+          item.generatedModelImages?.[0] || ""
+        )
+      }
 
-                    <h2
-                      className="
-                      title-highlight
-                        text-xl
-                        lg:text-lg
-                        font-semibold
-                        leading-8
-                        text-left
-                      "
-                    >
-                      {item.title}
-                    </h2>
+      src={
+        item.generatedModelImages?.[0] ||
+        "/placeholder.png"
+      }
 
-                  </div>
+      alt=""
 
-                  {/* DESCRIPTION */}
+      className="
+        w-24
+        h-28
+        lg:w-20
+        lg:h-30
+        rounded-[10px]
+        object-contain
+        border
+        border-gray-200
+        cursor-pointer
+        hover:scale-105
+        transition
+        shrink-0
+      "
+    />
 
-                  <div>
+  </div>
 
-                    <p
-                      className="
-                        subtitle-highlight
-                        leading-7
-                        text-sm
-                        lg:text-base
-                        text-left
-                        line-clamp-3
-                      "
-                    >
-                      {item.description}
-                    </p>
+  {/* MOBILE TITLE + DESCRIPTION */}
 
-                  </div>
+  <div
+    className="
+      flex
+      flex-col
+      gap-2
+      flex-1
+
+      lg:hidden
+    "
+  >
+
+    <h2
+      style={{
+        fontWeight: 600,
+      }}
+
+      className="
+        title-highlight
+        subtitle
+        text-left
+      "
+    >
+      {item.title}
+    </h2>
+
+    <p
+      className={`
+        subtitle-highlight
+        subtitle
+        text-left
+        transition-all
+        duration-300
+
+        ${
+          expandedCard === index
+            ? ""
+            : "line-clamp-3"
+        }
+      `}
+    >
+      {item.description}
+    </p>
+
+    {item.description && item.description.length > 120 && (
+
+      <button
+        onClick={() =>
+          setExpandedCard(
+            expandedCard === index
+              ? null
+              : index
+          )
+        }
+
+        className="
+          text-sm
+          font-medium
+          text-left
+          title-highlight
+          mt-1
+        "
+      >
+        {expandedCard === index
+          ? "Read Less"
+          : "Read More"}
+      </button>
+
+    )}
+
+  </div>
+
+</div>
+
+
+
+{/* DESKTOP TITLE */}
+
+<div className="hidden lg:block">
+
+  <h2
+    className="
+      title-highlight
+      subtitle
+      text-left
+    "
+  >
+    {item.title}
+  </h2>
+
+</div>
+
+{/* DESKTOP DESCRIPTION */}
+
+<div className="hidden lg:block">
+
+  <p
+    className="
+      subtitle-highlight
+      subtitle 
+      text-left
+      line-clamp-3
+    "
+  >
+    {item.description}
+  </p>
+
+</div>
 
                   {/* ACTION */}
 
@@ -1708,32 +2082,7 @@ transition
 
 
 
-//  <div className="grid grid-cols-2 gap-4">
 
-//   {data.generatedModelImages.map(
-//     (
-//       image,
-//       index
-//     ) => (
-
-//       <img
-//         key={index}
-//         src={image}
-//         alt=""
-//         className="
-//           w-full
-//           aspect-square
-//           object-contain
-//           rounded-[10px]
-//           border
-//           border-gray-200
-//         "
-//       />
-
-//     )
-//   )}
-
-// </div>
 
 
 

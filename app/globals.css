@@ -63,7 +63,31 @@ div {
   font-family: var(--font-familjen), sans-serif;
 }
 
+/* GLOBAL TITLES */
 
+.title {
+  font-family: var(--font-alro), sans-serif;
+  color: var(--highlight);
+
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.2;
+  font-weight: 700;
+
+  word-break: break-word;
+}
+
+/* GLOBAL SUBTITLES */
+
+.subtitle {
+  font-family: var(--font-familjen), sans-serif;
+  color: var(--highlightsubtitle);
+
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  line-height: 1.2;
+  font-weight: 400;
+
+  word-break: break-word;
+}
 
 
 .title-highlight {

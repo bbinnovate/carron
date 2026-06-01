@@ -78,7 +78,8 @@ Professional Indian fashion model, full-body shot head to toe, PURE WHITE BACKGR
 Professional Indian fashion model, full-body shot head to toe, PURE WHITE BACKGROUND (absolutely plain white, no texture, no shadows), wearing [exact product details], standing in left profile (left side facing camera), professional studio lighting, sharp focus. PRESERVE: exact colors, exact design, exact embroidery. CRITICAL: White background ONLY, no gradient, no studio elements.
 
 4. BACK ANGLE:
-Professional Indian fashion model, full-body shot head to toe, PURE WHITE BACKGROUND (absolutely plain white, no texture, no shadows), wearing [exact product details], standing with back to camera (facing away), back of garment fully visible, professional studio lighting, sharp focus. PRESERVE: exact colors, exact design, exact embroidery. CRITICAL: White background ONLY, no gradient, no studio elements. Show complete back view.
+Profession
+al Indian fashion model, full-body shot head to toe, PURE WHITE BACKGROUND (absolutely plain white, no texture, no shadows), wearing [exact product details], standing with back to camera (facing away), back of garment fully visible, professional studio lighting, sharp focus. PRESERVE: exact colors, exact design, exact embroidery. CRITICAL: White background ONLY, no gradient, no studio elements. Show complete back view.
 
 DO NOT:
 - Add gradients to background

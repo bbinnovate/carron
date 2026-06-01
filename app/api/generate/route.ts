@@ -34,7 +34,9 @@ export async function POST(
 const {
   imageUrl,
   gender,
-  characterImage,
+  backgroundColor,
+  backgroundType,
+  backgroundImage,
 } = body;
 
     // VALIDATION
@@ -137,7 +139,9 @@ try {
       parsed.imagePrompt,
       gender,
       imageUrl,
-      characterImage
+      backgroundColor,
+      backgroundType,
+      backgroundImage
     );
 
   console.log(
