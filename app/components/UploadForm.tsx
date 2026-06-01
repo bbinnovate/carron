@@ -1320,6 +1320,8 @@ className="
 
     onChange={(e) => {
 
+      
+
       if (
         !item.id ||
         item.syncedToShopify
