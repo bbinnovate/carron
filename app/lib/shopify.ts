@@ -7,6 +7,7 @@ interface ShopifyProductData {
   metaTitle?: string;
   metaDescription?: string;
   generatedModelImages?: string[];
+  gender?: string;
 }
 
 export const createShopifyProduct =
@@ -71,6 +72,37 @@ export const createShopifyProduct =
                 },
 
               ],
+
+              options: [
+  {
+    name: "Size",
+
+    values:
+      product.gender === "female"
+
+        ? ["XS", "S", "M", "L", "XL"]
+
+        : ["S", "M", "L", "XL"],
+  },
+],
+
+variants:
+  product.gender === "female"
+
+    ? [
+        { option1: "XS" },
+        { option1: "S" },
+        { option1: "M" },
+        { option1: "L" },
+        { option1: "XL" },
+      ]
+
+    : [
+        { option1: "S" },
+        { option1: "M" },
+        { option1: "L" },
+        { option1: "XL" },
+      ],
             },
           },
 

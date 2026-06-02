@@ -2,7 +2,7 @@
 "use client";
 
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   db,
 } from "../lib/firebase";
@@ -17,10 +17,6 @@ import {
 } from "firebase/firestore";
 import { characters }
 from "../lib/characters";
-
-import {
-  useEffect,
-} from "react";
 import { uploadImage } from "../lib/upload";
 
 interface ProductData {
@@ -33,7 +29,9 @@ interface ProductData {
   metaDescription?: string;
   gender?: string;
   shopifyDraftLink?: string;
-syncedToShopify?: boolean;
+  syncedToShopify?: boolean;
+  generationStatus?: string;
+  startedAt?: number;
 }
 export default function UploadForm() {
 
@@ -44,6 +42,7 @@ const [selectedDeleteProducts, setSelectedDeleteProducts] =
   useState<string[]>([]);
  const [products, setProducts] =
   useState<ProductData[]>([]);
+
 
   const [error, setError] =
     useState("");
@@ -61,7 +60,9 @@ const [selectedDeleteProducts, setSelectedDeleteProducts] =
   useState("default");
 
 const [selectedBgImage, setSelectedBgImage] =
-  useState("");
+  useState(
+    "https://firebasestorage.googleapis.com/v0/b/bombay-blokes-4c284.firebasestorage.app/o/jk-diamonds%2Fdownload%20(3).jpeg?alt=media&token=8dc81055-a27c-42a3-a94e-6ff13744b464"
+  );
 
   const [selectedBgColor, setSelectedBgColor] =
   useState("#AAB883");
@@ -80,6 +81,15 @@ const [bulkSyncLoading, setBulkSyncLoading] =
   const [previewModal, setPreviewModal] =
   useState("");
 
+  const [timerTick, setTimerTick] =
+  useState(0);
+
+  const [showGeneratePopup, setShowGeneratePopup] =
+  useState(false);
+
+const [showSyncPopup, setShowSyncPopup] =
+  useState(false);
+
 const nonDraftProducts =
   products.filter(
     (product) =>
@@ -93,7 +103,8 @@ const allSelected =
 
 
 
-  const fetchProducts =
+
+const fetchProducts =
   async () => {
 
     try {
@@ -136,25 +147,63 @@ useEffect(() => {
 
 }, []);
 
+
+useEffect(() => {
+
+  const interval =
+    setInterval(() => {
+
+      setTimerTick(
+        (prev) => prev + 1
+      );
+
+    }, 1000);
+
+  return () =>
+    clearInterval(interval);
+
+}, []);
+
+
 const handleUpload = (
   e: React.ChangeEvent<HTMLInputElement>
 ) => {
 
   const files =
-  Array.from(
-    e.target.files || []
-  ).slice(0, 4);
+    Array.from(
+      e.target.files || []
+    ).slice(0, 4);
 
-if (
-  files.length > 4
-) {
+  // FILE SIZE VALIDATION
 
-  setError(
-    "You can upload maximum 4 images only."
-  );
+  const oversizedFiles =
+    files.filter(
+      (file) =>
+        file.size >
+        5 * 1024 * 1024
+    );
 
-  return;
-}
+  if (
+    oversizedFiles.length > 0
+  ) {
+
+    setError(
+      "Please upload images under 5MB."
+    );
+
+    return;
+  }
+
+  if (
+    files.length > 4
+  ) {
+
+    setError(
+      "You can upload maximum 4 images only."
+    );
+
+    return;
+  }
 
   setSelectedFiles(files);
 
@@ -166,11 +215,26 @@ if (
 
   setPreviews(previewUrls);
 
- 
-
   setError("");
 };
 
+const getRemainingTime = (
+  createdAt: number
+) => {
+
+  const now =
+    Date.now();
+
+  const diff =
+    120 -
+    Math.floor(
+      (now - createdAt) / 1000
+    );
+
+  return diff > 0
+    ? diff
+    : 0;
+};
 
 const handleGenerate =
   async () => {
@@ -186,9 +250,62 @@ const handleGenerate =
         return;
       }
 
-      setLoading(true);
+
 
       setError("");
+
+
+      setShowGeneratePopup(true);
+
+setTimeout(() => {
+
+  setShowGeneratePopup(false);
+
+}, 10000);
+
+      // RESET FORM INSTANTLY
+
+const tempPreview =
+  previews[0] || "";
+
+setSelectedFiles([]);
+setPreviews([]);
+
+// TEMP GENERATING ROW
+
+const tempProduct = {
+
+  id:
+    `temp-${Date.now()}`,
+
+  startedAt:
+    Date.now(),
+
+  title:
+    "Generating Product...",
+
+  description:
+    "AI is generating your product. Please wait...",
+
+  generatedModelImages:
+    tempPreview
+      ? [tempPreview]
+      : [],
+
+  generationStatus:
+    "generating",
+
+  gender:
+    selectedGender,
+};
+
+// SHOW ON TOP
+
+
+setProducts((prev: any) => [
+  tempProduct,
+  ...prev,
+]);
 
       // UPLOAD TO FIREBASE
 
@@ -205,8 +322,8 @@ const handleGenerate =
         await axios.post(
           "/api/generate",
           {
-            imageUrl:
-  uploadedImages[0],
+             imageUrls:
+        uploadedImages,
             gender:
               selectedGender,
 
@@ -231,7 +348,29 @@ backgroundImage:
         );
       }
 
-      await fetchProducts();
+      // REMOVE TEMP ROW
+
+setProducts((prev: any) =>
+  prev.filter(
+    (item: any) =>
+      !String(item.id).startsWith(
+        "temp-"
+      )
+  )
+);
+
+// FETCH REAL PRODUCTS
+
+await fetchProducts();
+
+
+setShowSyncPopup(true);
+
+setTimeout(() => {
+
+  setShowSyncPopup(false);
+
+}, 10000);
 
     } catch (err: any) {
 
@@ -245,7 +384,7 @@ backgroundImage:
 
     } finally {
 
-      setLoading(false);
+  
     }
 };
 
@@ -298,7 +437,13 @@ const handleShopifySync =
         );
       }
 
+      // REFRESH PRODUCTS
+
       await fetchProducts();
+
+      // SHOW SUCCESS POPUP
+
+
 
     } catch (error: any) {
 
@@ -332,6 +477,15 @@ const handleBulkShopifySync =
       await fetchProducts();
 
       setSelectedProducts([]);
+
+
+      setShowSyncPopup(true);
+
+setTimeout(() => {
+
+  setShowSyncPopup(false);
+
+}, 10000);
 
     } catch (error) {
 
@@ -589,7 +743,7 @@ const handleDeleteSelectedProducts =
   "
 >
   <span>
-    Supports PNG, JPG, and WEBP.
+    Supports PNG, JPG, and WEBP. Max 5MB per image.
   </span>
 
   <span>
@@ -707,7 +861,28 @@ xl:grid-cols-10
 
 )}
 
+  {/* ERROR */}
 
+  {error && (
+
+    <div
+      className="
+        mt-8
+        bg-red-100
+        border
+        border-red-300
+        text-red-700
+        px-5
+        py-4
+        rounded-[10px]
+      "
+    >
+
+      {error}
+
+    </div>
+
+  )}
 
 
   {/* GENDER SELECTION */}
@@ -799,69 +974,9 @@ xl:grid-cols-10
 
   </div>
 
-{/* BG IMAGE PICKER */}
 
-{backgroundType === "image" && (
 
-  <div
-    className="
-      mt-8
-      flex
-      items-center
-      justify-center
-      gap-5
-      flex-wrap
-    "
-  >
 
-    {[
-      "https://firebasestorage.googleapis.com/v0/b/bombay-blokes-4c284.firebasestorage.app/o/jk-diamonds%2Fdownload%20(3).jpeg?alt=media&token=8dc81055-a27c-42a3-a94e-6ff13744b464",
-      "https://firebasestorage.googleapis.com/v0/b/bombay-blokes-4c284.firebasestorage.app/o/jk-diamonds%2Fdownload%20(2).jpeg?alt=media&token=981c862e-48c9-4279-8f7b-74438b9c9cfd",
-    ].map((bg) => (
-
-      <button
-        key={bg}
-        type="button"
-        onClick={() =>
-          setSelectedBgImage(bg)
-        }
-        className={`
-          relative
-          w-40
-          aspect-[5/6]
-          rounded-[10px]
-          overflow-hidden
-          cursor-pointer
-          border-4
-          transition
-
-          ${
-            selectedBgImage === bg
-
-              ? "border-black scale-105"
-
-              : "border-transparent"
-          }
-        `}
-      >
-
-        <img
-          src={bg}
-          alt=""
-          className="
-            w-full
-            h-full
-            object-cover
-          "
-        />
-
-      </button>
-
-    ))}
-
-  </div>
-
-)}
   {/* GENERATE BUTTON */}
 
 
@@ -978,9 +1093,17 @@ xl:grid-cols-10
 
     <button
       type="button"
-      onClick={() =>
-        setBackgroundType("image")
-      }
+      onClick={() => {
+
+  setBackgroundType("image");
+
+  if (!selectedBgImage) {
+
+    setSelectedBgImage(
+      "https://firebasestorage.googleapis.com/v0/b/bombay-blokes-4c284.firebasestorage.app/o/jk-diamonds%2Fdownload%20(3).jpeg?alt=media&token=8dc81055-a27c-42a3-a94e-6ff13744b464"
+    );
+  }
+}}
       className={`
         px-6
         py-4
@@ -1005,7 +1128,69 @@ xl:grid-cols-10
 
 </div>
 
-  {/* {previews.length > 0 && !loading && ( */}
+{/* BG IMAGE PICKER */}
+
+{backgroundType === "image" && (
+
+  <div
+    className="
+      mt-8
+      flex
+      items-center
+      justify-center
+      gap-5
+      flex-wrap
+    "
+  >
+
+    {[
+      "https://firebasestorage.googleapis.com/v0/b/bombay-blokes-4c284.firebasestorage.app/o/jk-diamonds%2Fdownload%20(3).jpeg?alt=media&token=8dc81055-a27c-42a3-a94e-6ff13744b464",
+      "https://firebasestorage.googleapis.com/v0/b/bombay-blokes-4c284.firebasestorage.app/o/jk-diamonds%2Fdownload%20(2).jpeg?alt=media&token=981c862e-48c9-4279-8f7b-74438b9c9cfd",
+    ].map((bg) => (
+
+      <button
+        key={bg}
+        type="button"
+        onClick={() =>
+          setSelectedBgImage(bg)
+        }
+        className={`
+          relative
+          w-40
+          aspect-[5/6]
+          rounded-[10px]
+          overflow-hidden
+          cursor-pointer
+          border-4
+          transition
+
+          ${
+            selectedBgImage === bg
+
+              ? "border-black scale-105"
+
+              : "border-transparent"
+          }
+        `}
+      >
+
+        <img
+          src={bg}
+          alt=""
+          className="
+            w-full
+            h-full
+            object-cover
+          "
+        />
+
+      </button>
+
+    ))}
+
+  </div>
+
+)}
 
 <div
   className="
@@ -1019,7 +1204,6 @@ xl:grid-cols-10
 
   <button
     onClick={handleGenerate}
-    disabled={loading}
 
     className="
       bg-[var(--highlight)]
@@ -1044,41 +1228,9 @@ xl:grid-cols-10
 
       disabled:opacity-70
       disabled:cursor-not-allowed
-
-      flex
-      items-center
-      justify-center
-      gap-4
     "
   >
-
-    {loading && (
-
-      <div
-        className="
-          w-5
-          h-5
-          border-2
-          border-white
-          border-t-transparent
-          rounded-full
-          animate-spin
-          shrink-0
-        "
-      />
-
-    )}
-
-    <span>
-
-      {
-        loading
-          ? "Generating Product..."
-          : "Start Generation"
-      }
-
-    </span>
-
+    Start Generation
   </button>
 
   <p
@@ -1088,32 +1240,12 @@ xl:grid-cols-10
       text-center
     "
   >
-    Each product generation can take up to 2–3 minutes.
+    Each product generation can take
+    up to 2–3 minutes.
   </p>
 
 </div>
-  {/* ERROR */}
 
-  {error && (
-
-    <div
-      className="
-        mt-8
-        bg-red-100
-        border
-        border-red-300
-        text-red-700
-        px-5
-        py-4
-        rounded-[10px]
-      "
-    >
-
-      {error}
-
-    </div>
-
-  )}
 
 </div>
 
@@ -1162,19 +1294,23 @@ xl:grid-cols-10
     const itemsPerPage =
       isMobile ? 5 : 50;
 
-      const totalPages =
+const visibleProducts =
+  products.filter(
+    (product) =>
+      !product.syncedToShopify
+  );
+
+const totalPages =
   Math.ceil(
-    products.length /
+    visibleProducts.length /
     itemsPerPage
   );
 
-
-
-    const paginatedData =
-      products.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-      );
+const paginatedData =
+  visibleProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
     return (
 
@@ -1521,25 +1657,34 @@ className="
               ) => (
 
                 <div
-                  key={index}
-                  className="
-                    border-b
-                    border-gray-200
+                  key={item.id}
+                  className={`
+                        relative
+  border-b
+  border-gray-200
 
-                    lg:grid
-          lg:grid-cols-[100px_120px_1.2fr_2fr]
+ ${
+  item.generationStatus ===
+  "generating"
 
+    ? "bg-gray-50"
 
-                    lg:gap-6
-                    lg:px-6
-                    lg:py-6
-                    lg:items-center
+    : ""
+}
 
-                    flex
-                    flex-col
-                    gap-5
-                    p-5
-                  "
+  lg:grid
+  lg:grid-cols-[100px_120px_1.2fr_2fr]
+
+  lg:gap-6
+  lg:px-6
+  lg:py-6
+  lg:items-center
+
+  flex
+  flex-col
+  gap-5
+  p-5
+`}
                 >
 
                   {/* MOBILE SR */}
@@ -1728,6 +1873,47 @@ className="
       "
     />
 
+     {/* {(item.generatedModelImages || []).map(
+    (
+      image: string,
+      index: number
+    ) => (
+
+      <img
+        key={index}
+
+        onClick={() =>
+          setPreviewModal(
+            image
+          )
+        }
+
+        src={
+          image ||
+          "/placeholder.png"
+        }
+
+        alt=""
+
+        className="
+          w-24
+          h-28
+          lg:w-20
+          lg:h-30
+          rounded-[10px]
+          object-cover
+          border
+          border-gray-200
+          cursor-pointer
+          hover:scale-105
+          transition
+          shrink-0
+        "
+      />
+
+    )
+  )} */}
+
   </div>
 
   {/* MOBILE TITLE + DESCRIPTION */}
@@ -1757,6 +1943,104 @@ className="
       {item.title}
     </h2>
 
+
+{item.generationStatus ===
+  "generating" && (
+
+  <div
+    className="
+      absolute
+      inset-0
+      z-20
+
+      flex
+      flex-col
+      items-center
+      justify-center
+
+      backdrop-blur-[2px]
+      bg-white/50
+
+      rounded-[10px]
+      text-center
+
+      px-4
+
+      lg:hidden
+    "
+  >
+
+    <h2
+      className="
+        text-lg
+        font-semibold
+        title-highlight
+      "
+    >
+      Generating Product...
+    </h2>
+
+    <div
+      className="
+        mt-3
+        inline-flex
+        items-center
+        gap-2
+
+        bg-yellow-100
+        text-yellow-800
+
+        px-4
+        py-2
+
+        rounded-full
+        text-xs
+        font-medium
+      "
+    >
+
+      <div
+        className="
+          w-2
+          h-2
+          rounded-full
+          bg-yellow-500
+          animate-pulse
+        "
+      />
+
+      Generating • {" "}
+
+      {Math.floor(
+  getRemainingTime(
+    item.startedAt || 0
+  ) / 60
+)}
+:
+{String(
+  getRemainingTime(
+    item.startedAt || 0
+  ) % 60
+).padStart(2, "0")}
+
+    </div>
+
+    <p
+      className="
+        mt-3
+        subtitle-highlight
+        subtitle
+        text-center
+      "
+    >
+      AI is generating your product.
+      Please wait...
+    </p>
+
+  </div>
+
+)}
+
     <p
       className={`
         subtitle-highlight
@@ -1775,31 +2059,7 @@ className="
       {item.description}
     </p>
 
-    {item.description && item.description.length > 120 && (
-
-      <button
-        onClick={() =>
-          setExpandedCard(
-            expandedCard === index
-              ? null
-              : index
-          )
-        }
-
-        className="
-          text-sm
-          font-medium
-          text-left
-          title-highlight
-          mt-1
-        "
-      >
-        {expandedCard === index
-          ? "Read Less"
-          : "Read More"}
-      </button>
-
-    )}
+   
 
   </div>
 
@@ -1820,6 +2080,102 @@ className="
   >
     {item.title}
   </h2>
+
+
+ {item.generationStatus ===
+  "generating" && (
+
+  <div
+    className="
+      absolute
+      inset-0
+      z-20
+
+      flex
+      flex-col
+      items-center
+      justify-center
+
+      backdrop-blur-[2px]
+      bg-white/40
+
+      rounded-[10px]
+      text-center
+
+      px-4
+    "
+  >
+
+    <h2
+      className="
+        text-xl
+        font-semibold
+        title-highlight
+      "
+    >
+      Generating Product...
+    </h2>
+
+    <div
+      className="
+        mt-3
+        inline-flex
+        items-center
+        gap-2
+
+        bg-yellow-100
+        text-yellow-800
+
+        px-4
+        py-2
+
+        rounded-full
+        text-sm
+        font-medium
+      "
+    >
+
+      <div
+        className="
+          w-2
+          h-2
+          rounded-full
+          bg-yellow-500
+          animate-pulse
+        "
+      />
+
+      Generating • {" "}
+
+     {Math.floor(
+  getRemainingTime(
+    item.startedAt || 0
+  ) / 60
+)}
+:
+{String(
+  getRemainingTime(
+    item.startedAt || 0
+  ) % 60
+).padStart(2, "0")}
+
+    </div>
+
+    <p
+      className="
+        mt-4
+        subtitle-highlight
+        subtitle
+        max-w-md
+      "
+    >
+      AI is generating your product.
+      Please wait...
+    </p>
+
+  </div>
+
+)}
 
 </div>
 
@@ -2020,6 +2376,148 @@ className="
   })()}
 
 </div>
+
+
+{/* GENERATE POPUP */}
+
+{showGeneratePopup && (
+
+  <div
+    onClick={() =>
+      setShowGeneratePopup(false)
+    }
+    className="
+    
+      fixed
+      inset-0
+      z-[9999]
+      bg-black/40
+      backdrop-blur-sm
+      flex
+      items-center
+      justify-center
+      p-5
+    "
+  >
+
+    <div
+      onClick={(e) =>
+        e.stopPropagation()
+      }
+      className="
+      
+        bg-white
+        rounded-[20px]
+        p-8
+        max-w-md
+        w-full
+        text-center
+        shadow-2xl
+      "
+    >
+
+      <div className="text-5xl mb-5">
+        ⏳
+      </div>
+
+      <h2
+        className="
+          title 
+        title-highlight
+          mb-4
+        "
+      >
+        Product Generation Started
+      </h2>
+
+      <p
+        className="
+          subtitle-highlight
+    subtitle 
+        "
+      >
+        AI Product Generation
+        will take around
+        2–3 minutes.
+
+        Please wait or
+        come back later.
+      </p>
+
+    </div>
+
+  </div>
+
+)}
+
+{/* SHOPIFY SYNC POPUP */}
+
+{showSyncPopup && (
+
+  <div
+    onClick={() =>
+      setShowSyncPopup(false)
+    }
+    className="
+      fixed
+      inset-0
+      z-[9999]
+      bg-black/40
+      backdrop-blur-sm
+      flex
+      items-center
+      justify-center
+      p-5
+    "
+  >
+
+    <div
+      onClick={(e) =>
+        e.stopPropagation()
+      }
+      className="
+        bg-white
+        rounded-[20px]
+        p-8
+        max-w-md
+        w-full
+        text-center
+        shadow-2xl
+      "
+    >
+
+      <div className="text-5xl mb-5">
+        ✅
+      </div>
+
+      <h2
+        className="
+          title 
+        title-highlight
+          mb-4
+        "
+      >
+        Shopify Sync Completed
+      </h2>
+
+      <p
+        className="
+          subtitle-highlight
+    subtitle 
+        "
+      >
+        Your product has been
+        added to your Shopify
+        store successfully.
+
+        Please check your store.
+      </p>
+
+    </div>
+
+  </div>
+
+)}
 
 {previewModal && (
 

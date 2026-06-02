@@ -31,17 +31,20 @@ export async function POST(
     const body =
       await req.json();
 
-const {
-  imageUrl,
-  gender,
-  backgroundColor,
-  backgroundType,
-  backgroundImage,
-} = body;
+    const {
+      imageUrls,
+      gender,
+      backgroundColor,
+      backgroundType,
+      backgroundImage,
+    } = body;
 
     // VALIDATION
 
-    if (!imageUrl) {
+    if (
+      !imageUrls ||
+      imageUrls.length === 0
+    ) {
 
       return NextResponse.json(
         {
@@ -59,7 +62,7 @@ const {
 
     const result =
       await analyzeProduct(
-        imageUrl
+        imageUrls[0]
       );
 
     // RAW CLAUDE TEXT
@@ -128,90 +131,93 @@ const {
     );
 
     // GENERATE MODEL IMAGE
-let nanoResult: any;
 
-let uploadedModelImages: string[] = [];
+    let nanoResult: any;
 
-try {
+    let uploadedModelImages: string[] = [];
 
-  nanoResult =
-    await generateModelImage(
-      parsed.imagePrompt,
-      gender,
-      imageUrl,
-      backgroundColor,
-      backgroundType,
-      backgroundImage
-    );
+    try {
 
-  console.log(
-    "NANO RESULT:",
-    nanoResult
-  );
+      nanoResult =
+        await generateModelImage(
+          parsed.imagePrompt,
+          gender,
+          imageUrls[0],
+          backgroundColor,
+          backgroundType,
+          backgroundImage
+        );
 
-  // SAFE CHECK
+      console.log(
+        "NANO RESULT:",
+        nanoResult
+      );
 
-  if (
-    !nanoResult?.images ||
-    nanoResult.images.length === 0
-  ) {
+      // SAFE CHECK
 
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          "No images generated",
-      },
-      {
-        status: 500,
+      if (
+        !nanoResult?.images ||
+        nanoResult.images.length === 0
+      ) {
+
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              "No images generated",
+          },
+          {
+            status: 500,
+          }
+        );
       }
-    );
-  }
 
-  // UPLOAD ALL IMAGES
+      // UPLOAD ALL GENERATED IMAGES
 
-  uploadedModelImages =
-    await Promise.all(
+      uploadedModelImages =
+        await Promise.all(
 
-      nanoResult.images.map(
-        async (
-          image: string
-        ) => {
+          nanoResult.images.map(
+            async (
+              image: string
+            ) => {
 
-          return await uploadBase64Image(
-            image
-          );
+              return await uploadBase64Image(
+                image
+              );
+            }
+          )
+        );
+
+    } catch (nanoError: any) {
+
+      console.log(
+        "NANO BANANA ERROR:",
+        nanoError?.response?.data ||
+        nanoError
+      );
+
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Nano Banana image generation failed",
+        },
+        {
+          status: 500,
         }
-      )
-    );
-
-} catch (nanoError: any) {
-
-  console.log(
-    "NANO BANANA ERROR:",
-    nanoError?.response?.data ||
-    nanoError
-  );
-
-  return NextResponse.json(
-    {
-      success: false,
-      message:
-        "Nano Banana image generation failed",
-    },
-    {
-      status: 500,
+      );
     }
-  );
-}
+
     // FINAL DATA
 
     const finalData = {
 
-      imageUrl,
+      uploadedProductImages:
+        imageUrls || [],
 
       generatedModelImages:
-  uploadedModelImages || [],
+        uploadedModelImages || [],
 
       imagePrompt:
         parsed?.imagePrompt || "",
@@ -229,6 +235,15 @@ try {
         parsed?.metaDescription || "",
 
       gender,
+
+      backgroundColor:
+        backgroundColor || "",
+
+      backgroundType:
+        backgroundType || "",
+
+      backgroundImage:
+        backgroundImage || "",
 
       createdAt:
         serverTimestamp(),

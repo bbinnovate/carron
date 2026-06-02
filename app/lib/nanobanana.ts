@@ -36,7 +36,7 @@ export const generateModelImage =
   WALKING ANGLE:
   model walking naturally toward camera,
   one leg forward,
-  realistic fashion runway movement,
+  realistic fashion runway movement, 
   dynamic kurta flow,
   full body visible,
   premium ecommerce fashion photography,
