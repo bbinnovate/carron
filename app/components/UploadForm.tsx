@@ -226,7 +226,7 @@ const getRemainingTime = (
     Date.now();
 
   const diff =
-    120 -
+    180 -
     Math.floor(
       (now - createdAt) / 1000
     );
@@ -258,10 +258,8 @@ const handleGenerate =
       setShowGeneratePopup(true);
 
 setTimeout(() => {
-
   setShowGeneratePopup(false);
-
-}, 10000);
+}, 180000); // 3 minutes
 
       // RESET FORM INSTANTLY
 
@@ -1300,6 +1298,49 @@ const visibleProducts =
       !product.syncedToShopify
   );
 
+
+  const totalGeneratedImages =
+  products.reduce(
+    (total, product) => {
+
+      return (
+        total +
+        (
+          product
+            .generatedModelImages
+            ?.length || 0
+        )
+      );
+
+    },
+    0
+  );
+
+
+  const totalSpend = 845;
+
+
+  const costPerImage =
+  totalGeneratedImages > 0
+
+    ? (
+        totalSpend /
+        totalGeneratedImages
+      ).toFixed(2)
+
+    : 0;
+
+
+    const costPerProduct =
+  products.length > 0
+
+    ? (
+        totalSpend /
+        products.length
+      ).toFixed(2)
+
+    : 0;
+
 const totalPages =
   Math.ceil(
     visibleProducts.length /
@@ -1326,6 +1367,87 @@ const paginatedData =
       >
 
         {/* DESKTOP HEADER */}
+
+
+        {/* <div
+  className="
+    grid
+    grid-cols-2
+    md:grid-cols-4
+    gap-4
+    mb-8
+  "
+>
+
+  <div
+    className="
+      bg-white
+      border
+      rounded-[10px]
+      p-5
+    "
+  >
+    <p className="text-sm text-gray-500">
+      Total Spend
+    </p>
+
+    <h2 className="text-3xl font-bold">
+      ₹{totalSpend}
+    </h2>
+  </div>
+
+  <div
+    className="
+      bg-white
+      border
+      rounded-[10px]
+      p-5
+    "
+  >
+    <p className="text-sm text-gray-500">
+      Total Images
+    </p>
+
+    <h2 className="text-3xl font-bold">
+      {totalGeneratedImages}
+    </h2>
+  </div>
+
+  <div
+    className="
+      bg-white
+      border
+      rounded-[10px]
+      p-5
+    "
+  >
+    <p className="text-sm text-gray-500">
+      Cost / Image
+    </p>
+
+    <h2 className="text-3xl font-bold">
+      ₹{costPerImage}
+    </h2>
+  </div>
+
+  <div
+    className="
+      bg-white
+      border
+      rounded-[10px]
+      p-5
+    "
+  >
+    <p className="text-sm text-gray-500">
+      Cost / Product
+    </p>
+
+    <h2 className="text-3xl font-bold">
+      ₹{costPerProduct}
+    </h2>
+  </div>
+
+</div> */}
 
       <div
   className="
@@ -2560,538 +2682,3 @@ className="
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import axios from "axios";
-// import { useState } from "react";
-
-// import { uploadImage } from "../lib/upload";
-
-// interface ProductData {
-//   generatedModelImages: string[];
-//   imagePrompt: string;
-//   title: string;
-//   description: string;
-//   metaTitle: string;
-//   metaDescription: string;
-//   gender: string;
-// }
-// export default function UploadForm() {
-
-//   const [loading, setLoading] =
-//     useState(false);
-
-//   const [data, setData] =
-//     useState<ProductData | null>(null);
-
-//   const [error, setError] =
-//     useState("");
-
-//   const [preview, setPreview] =
-//     useState("");
-
-//     const [selectedGender, setSelectedGender] =
-//   useState("male");
-
-//   const handleUpload = async (
-//     e: React.ChangeEvent<HTMLInputElement>
-//   ) => {
-
-//     try {
-
-//       setLoading(true);
-
-//       setError("");
-
-//       setData(null);
-
-//       const file =
-//         e.target.files?.[0];
-
-//       if (!file) {
-
-//         setError(
-//           "Please select an image."
-//         );
-
-//         return;
-//       }
-
-//       // PREVIEW
-
-//       const previewUrl =
-//         URL.createObjectURL(file);
-
-//       setPreview(previewUrl);
-
-//       // UPLOAD TO FIREBASE
-
-//       const imageUrl =
-//         await uploadImage(file);
-
-//       // SEND TO BACKEND
-
-//       const response =
-//         await axios.post(
-//           "/api/generate",
-//           {
-//   imageUrl,
-//   gender: selectedGender,
-// }
-//         );
-
-//       if (
-//         !response.data.success
-//       ) {
-
-//         throw new Error(
-//           response.data.message
-//         );
-//       }
-
-//       setData(
-//         response.data.data
-//       );
-
-//     } catch (err: any) {
-
-//       console.log(err);
-
-//       setError(
-//         err?.response?.data?.message ||
-//         err?.message ||
-//         "Something went wrong."
-//       );
-
-//     } finally {
-
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-
-//     <div className="min-h-screen bg-white text-black px-4 py-10">
-
-//       <div className="max-w-6xl mx-auto">
-
-//         {/* HEADER */}
-
-//         <div className="text-center mb-12">
-
-//           <h1 className="text-5xl font-bold mb-4">
-//             AI Product Generator
-//           </h1>
-
-//           <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-//             Upload any product image and
-//             generate SEO content,
-//             descriptions, titles,
-//             meta data, and AI model visuals.
-//           </p>
-
-//         </div>
-
-
-//         <div className="mb-8 flex items-center justify-center gap-8">
-
-//   <label className="flex items-center gap-3 cursor-pointer">
-
-//     <input
-//       type="radio"
-//       value="male"
-//       checked={selectedGender === "male"}
-//       onChange={(e) =>
-//         setSelectedGender(e.target.value)
-//       }
-//       className="w-5 h-5"
-//     />
-
-//     <span className="font-medium">
-//       Male Model
-//     </span>
-
-//   </label>
-
-//   <label className="flex items-center gap-3 cursor-pointer">
-
-//     <input
-//       type="radio"
-//       value="female"
-//       checked={selectedGender === "female"}
-//       onChange={(e) =>
-//         setSelectedGender(e.target.value)
-//       }
-//       className="w-5 h-5"
-//     />
-
-//     <span className="font-medium">
-//       Female Model
-//     </span>
-
-//   </label>
-
-// </div>
-
-//         {/* UPLOAD SECTION */}
-
-//         <div className="bg-gray-50 border border-gray-200 rounded-[30px] p-8 shadow-sm">
-
-//           <label
-//             htmlFor="fileUpload"
-//             className="
-//               border-2
-//               border-dashed
-//               border-gray-300
-//               rounded-[10px]
-//               p-14
-//               flex
-//               flex-col
-//               items-center
-//               justify-center
-//               cursor-pointer
-//               transition
-//               hover:border-black
-//               hover:bg-white
-//             "
-//           >
-
-//             <div className="w-20 h-20 rounded-full bg-black text-white flex items-center justify-center text-3xl mb-5">
-//               ↑
-//             </div>
-
-//             <h2 className="text-2xl font-semibold mb-2">
-//               Upload Product Image
-//             </h2>
-
-//             <p className="text-gray-500 text-center">
-//               Supports PNG, JPG, WEBP
-//             </p>
-
-//             <input
-//               id="fileUpload"
-//               type="file"
-//               accept="image/*"
-//               onChange={handleUpload}
-//               className="hidden"
-//             />
-
-//           </label>
-
-//           {/* PREVIEW */}
-
-//           {preview && (
-
-//             <div className="mt-10 flex justify-center">
-
-//               <img
-//                 src={preview}
-//                 alt="preview"
-//                 className="
-//                   w-[210px]
-//                   h-[280px]
-//                   object-contain
-//                   rounded-[10px]
-//                   border
-//                   border-gray-200
-//                   shadow-sm
-//                 "
-//               />
-
-//             </div>
-
-//           )}
-
-//           {/* LOADING */}
-
-//           {loading && (
-
-//             <div className="flex justify-center mt-8">
-
-//               <div className="bg-black text-white px-8 py-4 rounded-full flex items-center gap-4">
-
-//                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-
-//                 <p className="font-medium">
-//                   Generating Product...
-//                 </p>
-
-//               </div>
-              
-
-//             </div>
-
-//           )}
-
-//           {/* ERROR */}
-
-//           {error && (
-
-//             <div className="mt-8 bg-red-100 border border-red-300 text-red-700 px-5 py-4 rounded-2xl">
-
-//               {error}
-
-//             </div>
-
-//           )}
-
-//         </div>
-
-//         {/* RESULT */}
-
-//         {data && (
-
-//           <div className="mt-14 grid lg:grid-cols-2 gap-8">
-
-//             {/* IMAGE */}
-
-//             <div className="bg-gray-50 border border-gray-200 rounded-[30px] p-5 shadow-sm">
-
-//             <div className="grid grid-cols-2 gap-4">
-
-//   {data.generatedModelImages.map(
-//     (
-//       image,
-//       index
-//     ) => (
-
-//       <img
-//         key={index}
-//         src={image}
-//         alt=""
-//         className="
-//           w-full
-//           aspect-square
-//           object-contain
-//           rounded-[10px]
-//           border
-//           border-gray-200
-//         "
-//       />
-
-//     )
-//   )}
-
-// </div>
-
-//             </div>
-
-//             {/* CONTENT */}
-
-//             <div className="bg-gray-50 border border-gray-200 rounded-[30px] p-8 shadow-sm">
-
-//               <div className="space-y-7">
-
-//                 <div>
-
-//   <p className="text-sm text-gray-500 mb-2">
-//     Gender
-//   </p>
-
-//   <p className="text-gray-700">
-//     {data.gender}
-//   </p>
-
-// </div>
-
-// <div>
-
-//   <p className="text-sm text-gray-500 mb-2">
-//     Hexxfield Prompt
-//   </p>
-
-//   <div className="bg-white border border-gray-200 rounded-2xl p-5 text-sm leading-7">
-
-//     {data.imagePrompt}
-
-//   </div>
-
-// </div>
-
-//                 <div>
-
-//                   <p className="text-sm text-gray-500 mb-2">
-//                     Product Title
-//                   </p>
-
-//                   <h1 className="text-4xl font-bold leading-tight">
-//                     {data.title}
-//                   </h1>
-
-//                 </div>
-
-//                 <div>
-
-//                   <p className="text-sm text-gray-500 mb-2">
-//                     Description
-//                   </p>
-
-//                   <p className="text-gray-700 leading-8">
-//                     {data.description}
-//                   </p>
-
-//                 </div>
-
-//                 <div>
-
-//                   <p className="text-sm text-gray-500 mb-2">
-//                     Meta Title
-//                   </p>
-
-//                   <p className="font-medium text-lg">
-//                     {data.metaTitle}
-//                   </p>
-
-//                 </div>
-
-//                 <div>
-
-//                   <p className="text-sm text-gray-500 mb-2">
-//                     Meta Description
-//                   </p>
-
-//                   <p className="text-gray-700 leading-8">
-//                     {data.metaDescription}
-//                   </p>
-
-//                 </div>
-
-//                 {/* BUTTONS */}
-
-//                 <div className="flex flex-wrap gap-4 pt-5">
-
-//                   <button
-//                     className="
-//                       bg-black
-//                       text-white
-//                       px-7
-//                       py-3
-//                       rounded-2xl
-//                       font-medium
-//                       hover:opacity-90
-//                       transition
-//                     "
-//                   >
-//                     Save Product
-//                   </button>
-
-//                   <button
-//                     className="
-//                       border
-//                       border-black
-//                       px-7
-//                       py-3
-//                       rounded-2xl
-//                       font-medium
-//                       hover:bg-black
-//                       hover:text-white
-//                       transition
-//                     "
-//                   >
-//                     Regenerate
-//                   </button>
-
-//                 </div>
-
-//               </div>
-
-//             </div>
-
-//           </div>
-
-//         )}
-
-//       </div>
-
-//     </div>
-//   );
-// }
