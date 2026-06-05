@@ -895,10 +895,13 @@ xl:grid-cols-4
 
 
   {/* back View UPLOAD BOX */}
-<div className="hidden lg:flex w-full lg:w-[30%]  flex-col gap-4">
+<div className="hidden lg:flex w-full lg:w-[30%] flex-col gap-4 relative">
   <label
     id="backFileUpload"
     className="
+
+    cursor-not-allowed
+    pointer-events-none
     min-h-[320px] h-full
       border-2
       border-dashed
@@ -1061,11 +1064,60 @@ xl:grid-cols-4
   </div>
 
 )}
+
+<div
+  className="
+    absolute
+    inset-0
+    z-50
+
+    bg-gray-500/70
+    backdrop-blur-[2px]
+
+    flex
+    items-center
+    justify-center
+
+    rounded-[10px]
+  "
+>
+  <div
+    className="
+      bg-white
+      px-6
+      py-4
+      rounded-[10px]
+      shadow-lg
+      text-center
+    "
+  >
+    <h3
+      className="
+        font-semibold
+        text-lg
+        text-gray-900
+      "
+    >
+      Work In Progress
+    </h3>
+
+    <p
+      className="
+        text-sm
+        text-gray-500
+        mt-1
+      "
+    >
+      Back image upload is currently disabled.
+    </p>
+  </div>
+</div>
 </div>
 
 
   {/* mobile  UPLOAD BOX */}
 <div className="flex flex-row gap-3 lg:hidden">
+   {/* front View UPLOAD BOX */}
  <div className="w-1/2">
   <label
     htmlFor="fileUpload"
@@ -1155,110 +1207,17 @@ xl:grid-cols-4
 
   </label>
 
-    {/*  Front View IMAGE PREVIEW */}
-{previews.length > 0 && (
-
-  <div
-    className="
-      mt-8
-      grid
-      grid-cols-4
-sm:grid-cols-4
-md:grid-cols-4
-lg:grid-cols-4
-xl:grid-cols-4
-      gap-3
-    "
-  >
-
-    {previews.map(
-      (
-        image,
-        index
-      ) => (
-
-        <div
-          key={index}
-          className="
-            relative
-            w-full
-            aspect-square
-          "
-        >
-
-          {/* REMOVE BUTTON */}
-
-          <button
-            type="button"
-            onClick={() =>
-              removePreview(index)
-            }
-            className="
-              absolute
-              -top-2
-              -left-2
-              z-20
-              w-6
-              h-6
-              rounded-full
-              cursor-pointer
-              bg-black
-              text-white
-              text-xs
-              flex
-              items-center
-              justify-center
-              shadow-md
-            "
-          >
-            ✕
-          </button>
-
-          {/* IMAGE BOX */}
-
-          <div
-            className="
-              w-full
-              h-full
-              overflow-hidden
-              rounded-2xl
-              border
-              border-gray-200
-              bg-white
-            "
-          >
-
-            <img
-              src={image}
-              alt=""
-              className="
-                w-full
-                h-full
-                object-cover
-              "
-            />
-
-          </div>
-
-        </div>
-
-      )
-    )}
-
-  </div>
-
-)}
-
-
 </div>
 
 
-
- <div className="w-1/2">
+ {/* back View UPLOAD BOX */}
+ <div className="w-1/2 relative">
 
  <label
     id="backFileUpload"
     className="
+    cursor-not-allowed
+    pointer-events-none
     min-h-[320px] h-full
       border-2
       border-dashed
@@ -1421,9 +1380,164 @@ xl:grid-cols-4
   </div>
 
 )}
-</div>
-</div>
 
+<div
+  className="
+    absolute
+    inset-0
+    z-50
+
+    bg-gray-500/70
+    backdrop-blur-[2px]
+
+    flex
+    items-center
+    justify-center
+
+    rounded-[10px]
+
+    p-3
+    sm:p-4
+  "
+>
+  <div
+    className="
+      bg-white
+
+      w-full
+      max-w-[280px]
+      sm:max-w-[320px]
+
+      px-2
+      py-4
+      sm:px-6
+      sm:py-5
+
+      rounded-[10px]
+      shadow-lg
+      text-center
+    "
+  >
+    <h3
+      className="
+        font-semibold
+        text-base
+        sm:text-lg
+        text-gray-900
+      "
+    >
+      Work In Progress
+    </h3>
+
+    <p
+      className="
+        text-xs
+        sm:text-sm
+        text-gray-500
+        mt-2
+        leading-relaxed
+      "
+    >
+      Back image upload is currently disabled.
+    </p>
+  </div>
+</div>
+</div>
+</div>
+    {/*  Front View IMAGE PREVIEW */}
+{previews.length > 0 && (
+
+  <div
+    className="
+    lg:hidden
+      mt-8
+      grid
+      grid-cols-4
+sm:grid-cols-4
+md:grid-cols-4
+lg:grid-cols-4
+xl:grid-cols-4
+      gap-3
+    "
+  >
+
+    {previews.map(
+      (
+        image,
+        index
+      ) => (
+
+        <div
+          key={index}
+          className="
+            relative
+            w-full
+            aspect-square
+          "
+        >
+
+          {/* REMOVE BUTTON */}
+
+          <button
+            type="button"
+            onClick={() =>
+              removePreview(index)
+            }
+            className="
+              absolute
+              -top-2
+              -left-2
+              z-20
+              w-6
+              h-6
+              rounded-full
+              cursor-pointer
+              bg-black
+              text-white
+              text-xs
+              flex
+              items-center
+              justify-center
+              shadow-md
+            "
+          >
+            ✕
+          </button>
+
+          {/* IMAGE BOX */}
+
+          <div
+            className="
+              w-full
+              h-full
+              overflow-hidden
+              rounded-2xl
+              border
+              border-gray-200
+              bg-white
+            "
+          >
+
+            <img
+              src={image}
+              alt=""
+              className="
+                w-full
+                h-full
+                object-cover
+              "
+            />
+
+          </div>
+
+        </div>
+
+      )
+    )}
+
+  </div>
+
+)}
 
   {/* ERROR */}
 
