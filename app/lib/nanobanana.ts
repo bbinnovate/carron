@@ -16,6 +16,7 @@ export const generateModelImage =
     prompt: string,
     gender: string,
     imageUrl: string,
+    backImage: string,
     backgroundColor: any,
     backgroundType: string,
     backgroundImage: string

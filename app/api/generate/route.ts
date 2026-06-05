@@ -33,6 +33,7 @@ export async function POST(
 
     const {
       imageUrls,
+      backImage,
       gender,
       backgroundColor,
       backgroundType,
@@ -143,6 +144,7 @@ export async function POST(
           parsed.imagePrompt,
           gender,
           imageUrls[0],
+           backImage,
           backgroundColor,
           backgroundType,
           backgroundImage
@@ -189,6 +191,14 @@ export async function POST(
           )
         );
 
+        if (backImage) {
+
+  uploadedModelImages.push(
+    backImage
+  );
+
+}
+
     } catch (nanoError: any) {
 
       console.log(
@@ -218,6 +228,9 @@ export async function POST(
 
       generatedModelImages:
         uploadedModelImages || [],
+
+         backImage:
+    backImage || "",
 
       imagePrompt:
         parsed?.imagePrompt || "",

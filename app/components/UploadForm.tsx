@@ -2,6 +2,7 @@
 "use client";
 
 import axios from "axios";
+import { User, UserRound } from "lucide-react";
 import { useState, useEffect } from "react";
 import {
   db,
@@ -69,6 +70,12 @@ const [selectedBgImage, setSelectedBgImage] =
 
   const [currentPage, setCurrentPage] =
   useState(1);
+
+  const [backImage, setBackImage] =
+  useState<File | null>(null);
+
+const [backImagePreview, setBackImagePreview] =
+  useState("");
 
 
 const [selectedProducts, setSelectedProducts] =
@@ -314,6 +321,17 @@ setProducts((prev: any) => [
           })
         );
 
+        let uploadedBackImage = "";
+
+if (backImage) {
+
+  uploadedBackImage =
+    await uploadImage(
+      backImage
+    );
+
+}
+
       // CALL API
 
       const response =
@@ -322,6 +340,10 @@ setProducts((prev: any) => [
           {
              imageUrls:
         uploadedImages,
+
+        backImage:
+        uploadedBackImage,
+        
             gender:
               selectedGender,
 
@@ -674,14 +696,22 @@ const handleDeleteSelectedProducts =
     p-4
     md:p-8
     shadow-sm
+      mt-10
+    flex
+    flex-col
+    lg:flex-row
+    gap-4
+    items-stretch
   "
 >
 
-  {/* UPLOAD BOX */}
 
+ {/* front View UPLOAD BOX */}
+<div className="w-full lg:w-[30%] hidden lg:flex flex-col gap-4">
   <label
     htmlFor="fileUpload"
     className="
+    min-h-[320px] h-full
       border-2
       border-dashed
       border-gray-300
@@ -726,9 +756,11 @@ const handleDeleteSelectedProducts =
        title 
         title-highlight
         mb-3
+        whitespace-normal
+    lg:whitespace-nowrap
       "
     >
-     Upload Raw Images
+    Upload 4 Front Images
     </h3>
 
 <p
@@ -744,9 +776,9 @@ const handleDeleteSelectedProducts =
     Supports PNG, JPG, and WEBP. Max 5MB per image.
   </span>
 
-  <span>
+  {/* <span>
     Upload up to 4 images at a time for a single product.
-  </span>
+  </span> */}
 
   {/* <span>
     Each product generation can take up to 2–3 minutes.
@@ -764,8 +796,7 @@ const handleDeleteSelectedProducts =
 
   </label>
 
-  {/* IMAGE PREVIEW */}
-
+    {/*  Front View IMAGE PREVIEW */}
 {previews.length > 0 && (
 
   <div
@@ -773,10 +804,10 @@ const handleDeleteSelectedProducts =
       mt-8
       grid
       grid-cols-4
-sm:grid-cols-5
-md:grid-cols-7
-lg:grid-cols-9
-xl:grid-cols-10
+sm:grid-cols-4
+md:grid-cols-4
+lg:grid-cols-4
+xl:grid-cols-4
       gap-3
     "
   >
@@ -859,6 +890,541 @@ xl:grid-cols-10
 
 )}
 
+
+</div>
+
+
+  {/* back View UPLOAD BOX */}
+<div className="hidden lg:flex w-full lg:w-[30%]  flex-col gap-4">
+  <label
+    id="backFileUpload"
+    className="
+    min-h-[320px] h-full
+      border-2
+      border-dashed
+      border-gray-300
+      rounded-[10px]
+      px-6
+      py-12
+      md:px-10
+      md:py-16
+      flex
+      flex-col
+      items-center
+      justify-center
+      cursor-pointer
+      transition
+      hover:border-[var(--highlight)]
+      hover:bg-white
+      text-center
+    "
+  >
+
+    <div
+      className="
+        w-16
+        h-16
+        md:w-20
+        md:h-20
+        rounded-full
+        bg-[var(--highlight)]
+        text-white
+        flex
+        items-center
+        justify-center
+        text-3xl
+        mb-5
+      "
+    >
+      ↑
+    </div>
+
+    <h3
+      className="
+       title 
+        title-highlight
+        mb-3
+        whitespace-normal
+    lg:whitespace-nowrap
+      "
+    >
+       Upload 1 Back Image
+    </h3>
+
+<p
+  className="
+    subtitle-highlight
+    subtitle 
+    flex
+    flex-col
+    gap-1
+  "
+>
+  <span>
+    Supports PNG, JPG, and WEBP. Max 5MB per image.
+  </span>
+
+
+  {/* <span>
+    Each product generation can take up to 2–3 minutes.
+  </span> */}
+</p>
+
+   
+
+<input
+  id="backImageInput"
+  type="file"
+  accept="image/*"
+  className="hidden"
+  onChange={(e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    setBackImage(file);
+    setBackImagePreview(URL.createObjectURL(file));
+  }}
+/>
+
+  </label>
+
+   {/*  back View IMAGE PREVIEW */}
+
+{backImagePreview && (
+
+  <div
+    className="
+      mt-8
+      grid
+      grid-cols-4
+      sm:grid-cols-4
+      md:grid-cols-4
+      lg:grid-cols-4
+      xl:grid-cols-4
+      gap-3
+    "
+  >
+
+    <div
+      className="
+        relative
+        aspect-square
+        max-w-[150px]
+      "
+    >
+
+      {/* REMOVE BUTTON */}
+      <button
+        type="button"
+        onClick={() => {
+          setBackImage(null);
+          setBackImagePreview("");
+        }}
+        className="
+          absolute
+          -top-2
+          -left-2
+          z-20
+          w-6
+          h-6
+          rounded-full
+          cursor-pointer
+          bg-black
+          text-white
+          text-xs
+          flex
+          items-center
+          justify-center
+          shadow-md
+        "
+      >
+        ✕
+      </button>
+
+      <img
+        src={backImagePreview}
+        alt=""
+        className="
+          w-full
+          h-full
+          object-cover
+          rounded-2xl
+          border
+          border-gray-200
+          bg-white
+        "
+      />
+
+    </div>
+
+  </div>
+
+)}
+</div>
+
+
+  {/* mobile  UPLOAD BOX */}
+<div className="flex flex-row gap-3 lg:hidden">
+ <div className="w-1/2">
+  <label
+    htmlFor="fileUpload"
+    className="
+    min-h-[320px] h-full
+      border-2
+      border-dashed
+      border-gray-300
+      rounded-[10px]
+      px-3
+      py-6
+      md:px-10
+      md:py-16
+      flex
+      flex-col
+      items-center
+      justify-center
+      cursor-pointer
+      transition
+      hover:border-[var(--highlight)]
+      hover:bg-white
+      text-center
+    "
+  >
+
+    <div
+      className="
+        w-16
+        h-16
+        md:w-20
+        md:h-20
+        rounded-full
+        bg-[var(--highlight)]
+        text-white
+        flex
+        items-center
+        justify-center
+        text-3xl
+        mb-5
+      "
+    >
+      ↑
+    </div>
+
+    <h3
+      className="
+       title 
+        title-highlight
+        mb-3
+        whitespace-normal
+    lg:whitespace-nowrap
+      "
+    >
+    Upload 4 Front Images
+    </h3>
+
+<p
+  className="
+    subtitle-highlight
+    subtitle 
+    flex
+    flex-col
+    gap-1
+  "
+>
+  <span>
+    Supports PNG, JPG, and WEBP. Max 5MB per image.
+  </span>
+
+  {/* <span>
+    Upload up to 4 images at a time for a single product.
+  </span> */}
+
+  {/* <span>
+    Each product generation can take up to 2–3 minutes.
+  </span> */}
+</p>
+
+    <input
+  id="fileUpload"
+  type="file"
+  multiple
+  accept="image/*"
+  onChange={handleUpload}
+  className="hidden"
+/>
+
+  </label>
+
+    {/*  Front View IMAGE PREVIEW */}
+{previews.length > 0 && (
+
+  <div
+    className="
+      mt-8
+      grid
+      grid-cols-4
+sm:grid-cols-4
+md:grid-cols-4
+lg:grid-cols-4
+xl:grid-cols-4
+      gap-3
+    "
+  >
+
+    {previews.map(
+      (
+        image,
+        index
+      ) => (
+
+        <div
+          key={index}
+          className="
+            relative
+            w-full
+            aspect-square
+          "
+        >
+
+          {/* REMOVE BUTTON */}
+
+          <button
+            type="button"
+            onClick={() =>
+              removePreview(index)
+            }
+            className="
+              absolute
+              -top-2
+              -left-2
+              z-20
+              w-6
+              h-6
+              rounded-full
+              cursor-pointer
+              bg-black
+              text-white
+              text-xs
+              flex
+              items-center
+              justify-center
+              shadow-md
+            "
+          >
+            ✕
+          </button>
+
+          {/* IMAGE BOX */}
+
+          <div
+            className="
+              w-full
+              h-full
+              overflow-hidden
+              rounded-2xl
+              border
+              border-gray-200
+              bg-white
+            "
+          >
+
+            <img
+              src={image}
+              alt=""
+              className="
+                w-full
+                h-full
+                object-cover
+              "
+            />
+
+          </div>
+
+        </div>
+
+      )
+    )}
+
+  </div>
+
+)}
+
+
+</div>
+
+
+
+ <div className="w-1/2">
+
+ <label
+    id="backFileUpload"
+    className="
+    min-h-[320px] h-full
+      border-2
+      border-dashed
+      border-gray-300
+      rounded-[10px]
+     px-3
+      py-6
+      md:px-10
+      md:py-16
+      flex
+      flex-col
+      items-center
+      justify-center
+      cursor-pointer
+      transition
+      hover:border-[var(--highlight)]
+      hover:bg-white
+      text-center
+    "
+  >
+
+    <div
+      className="
+        w-16
+        h-16
+        md:w-20
+        md:h-20
+        rounded-full
+        bg-[var(--highlight)]
+        text-white
+        flex
+        items-center
+        justify-center
+        text-3xl
+        mb-5
+      "
+    >
+      ↑
+    </div>
+
+    <h3
+      className="
+       title 
+        title-highlight
+        mb-3
+        whitespace-normal
+    lg:whitespace-nowrap
+      "
+    >
+       Upload 1 Back Image
+    </h3>
+
+<p
+  className="
+    subtitle-highlight
+    subtitle 
+    flex
+    flex-col
+    gap-1
+  "
+>
+  <span>
+    Supports PNG, JPG, and WEBP. Max 5MB per image.
+  </span>
+
+
+  {/* <span>
+    Each product generation can take up to 2–3 minutes.
+  </span> */}
+</p>
+
+   
+
+<input
+  id="backImageInput"
+  type="file"
+  accept="image/*"
+  className="hidden"
+  onChange={(e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    setBackImage(file);
+    setBackImagePreview(URL.createObjectURL(file));
+  }}
+/>
+
+  </label>
+
+   {/*  back View IMAGE PREVIEW */}
+
+{backImagePreview && (
+
+  <div
+    className="
+      mt-8
+      grid
+      grid-cols-4
+      sm:grid-cols-4
+      md:grid-cols-4
+      lg:grid-cols-4
+      xl:grid-cols-4
+      gap-3
+    "
+  >
+
+    <div
+      className="
+        relative
+        aspect-square
+        max-w-[150px]
+      "
+    >
+
+      {/* REMOVE BUTTON */}
+      <button
+        type="button"
+        onClick={() => {
+          setBackImage(null);
+          setBackImagePreview("");
+        }}
+        className="
+          absolute
+          -top-2
+          -left-2
+          z-20
+          w-6
+          h-6
+          rounded-full
+          cursor-pointer
+          bg-black
+          text-white
+          text-xs
+          flex
+          items-center
+          justify-center
+          shadow-md
+        "
+      >
+        ✕
+      </button>
+
+      <img
+        src={backImagePreview}
+        alt=""
+        className="
+          w-full
+          h-full
+          object-cover
+          rounded-2xl
+          border
+          border-gray-200
+          bg-white
+        "
+      />
+
+    </div>
+
+  </div>
+
+)}
+</div>
+</div>
+
+
   {/* ERROR */}
 
   {error && (
@@ -883,94 +1449,75 @@ xl:grid-cols-10
   )}
 
 
+
+<div className="lg:w-[40%]
+      flex
+      flex-col
+      gap-4 
+      lg:px-5
+      p-0">
+
   {/* GENDER SELECTION */}
 
-  <div
-    className="
-      mt-10
-      flex
-      flex-row
-      sm:flex-row
-      items-center
-      justify-center
-      gap-4
-    "
+<div className="flex items-center gap-4 lg:mt-0 mt-5">
+  {/* Male */}
+  <button
+    type="button"
+    onClick={() => setSelectedGender("male")}
+    className="bg-transparent"
   >
-
-    <label
-      className="
-        flex
-        items-center
-        gap-3
-        cursor-pointer
-        bg-white
-        border
-        border-gray-200
-        rounded-[10px]
-        px-6
-        py-4
-        min-w-[180px]
-        justify-center
-      "
-    >
-
-      <input
-        type="radio"
-        value="male"
-        checked={selectedGender === "male"}
-        onChange={(e) =>
-          setSelectedGender(e.target.value)
+    <div
+      className={`
+        w-12 h-12
+        sm:w-18 sm:h-18
+        rounded-full
+        overflow-hidden
+          cursor-pointer
+        transition-all
+        ${
+          selectedGender === "male"
+            ? "border-3 border-black"
+            : "border border-gray-300"
         }
-        className="w-5 h-5"
-      />
-
-      <span className="font-medium">
-        Male Model
-      </span>
-
-    </label>
-
-    <label
-      className="
-        flex
-        items-center
-        gap-3
-        cursor-pointer
-        bg-white
-        border
-        border-gray-200
-        rounded-[10px]
-        px-6
-        py-4
-        min-w-[180px]
-        justify-center
-      "
+      `}
     >
-
-      <input
-        type="radio"
-        value="female"
-        checked={selectedGender === "female"}
-        onChange={(e) =>
-          setSelectedGender(e.target.value)
-        }
-        className="w-5 h-5"
+      <img
+        src="/icons/man.png"
+        alt="Male"
+        className="w-full h-full object-cover"
       />
+    </div>
+  </button>
 
-      <span className="font-medium">
-        Female Model
-      </span>
-
-    </label>
-
-
-
-
-    {/* CHARACTER SELECTION */}
-
-
-
-  </div>
+  {/* Female */}
+  <button
+    type="button"
+    onClick={() => setSelectedGender("female")}
+    className="bg-transparent"
+  >
+    <div
+      className={`
+        w-12 h-12
+        sm:w-18 sm:h-18
+        cursor-pointer
+        rounded-full
+        overflow-hidden
+        transition-all
+        ${
+          selectedGender === "female"
+            ? "border-3 border-black"
+            : "border border-gray-300"
+        }
+      `}
+    >
+      <img
+        src="/icons/woman.png"
+        alt="Female"
+        className="w-full h-full object-cover"
+      />
+    </div>
+  </button>
+</div>
 
 
 
@@ -978,12 +1525,9 @@ xl:grid-cols-10
   {/* GENERATE BUTTON */}
 
 
-  {/* BACKGROUND COLOR */}
-{/* BACKGROUND TYPE */}
+<div className="mt-5">
 
-<div className="mt-10">
-
-  <div className="text-center mb-5">
+  <div className="mb-5">
 
     <h3
       className="
@@ -992,7 +1536,7 @@ xl:grid-cols-10
         font-semibold
         title-highlight
         
-        mb-2
+       
       "
     >
       Background Style
@@ -1004,8 +1548,7 @@ xl:grid-cols-10
     className="
       flex
       flex-wrap
-      items-center
-      justify-center
+     
       gap-4
     "
   >
@@ -1052,7 +1595,7 @@ xl:grid-cols-10
     transition
     cursor-pointer
     flex
-    items-center
+
     gap-3
 
     ${
@@ -1088,7 +1631,7 @@ xl:grid-cols-10
 </button>
 
     {/* BG IMAGE */}
-
+{/* 
     <button
       type="button"
       onClick={() => {
@@ -1120,7 +1663,7 @@ xl:grid-cols-10
       `}
     >
       Background Image
-    </button>
+    </button> */}
 
   </div>
 
@@ -1194,39 +1737,38 @@ xl:grid-cols-10
   className="
     flex
     flex-col
-    items-center
     gap-4
-    mt-10
+    lg:mt-10 mt-5
+    w-full
   "
 >
 
   <button
     onClick={handleGenerate}
 
-    className="
-      bg-[var(--highlight)]
-      text-white
+   className="
+  bg-[var(--highlight)]
+  text-white
 
-      px-8
-      md:px-12
+  px-8
+  md:px-12
 
-      py-4
+  py-4
 
-      rounded-[10px]
+  rounded-[10px]
 
-      font-semibold
-      text-base
-      md:text-lg
+  font-semibold
+  text-base
+  md:text-lg
 
-      hover:opacity-90
-      transition
+  hover:opacity-90
+  transition
 
-      w-full
-      sm:w-auto
+  w-full
 
-      disabled:opacity-70
-      disabled:cursor-not-allowed
-    "
+  disabled:opacity-70
+  disabled:cursor-not-allowed
+"
   >
     Start Generation
   </button>
@@ -1246,6 +1788,8 @@ xl:grid-cols-10
 
 
 </div>
+</div>
+
 
 
 {/* <div
@@ -1298,6 +1842,11 @@ const visibleProducts =
       !product.syncedToShopify
   );
 
+  const syncedProducts =
+  products.filter(
+    (product) =>
+      product.syncedToShopify
+  );
 
   const totalGeneratedImages =
   products.reduce(
@@ -1355,16 +1904,30 @@ const paginatedData =
 
     return (
 
-      <div
-        className="
-          bg-white
-          border
-          border-gray-200
-          rounded-[10px]
-          shadow-sm
-          overflow-visible
-        "
-      >
+      <div className="">
+
+<div
+  className="
+    bg-white
+    border
+    border-gray-200
+    rounded-[10px]
+    shadow-sm
+    overflow-visible
+    gap-40
+
+    max-h-[700px]
+overflow-y-auto
+
+    scrollbar-thin
+    scrollbar-thumb-[var(--highlight)]
+    scrollbar-track-gray-100
+  "
+  style={{
+    scrollbarWidth: "thin",
+    scrollbarColor: "var(--highlight) #f3f4f6",
+  }}
+>
 
         {/* DESKTOP HEADER */}
 
@@ -2492,12 +3055,187 @@ className="
 
 
       </div>
+{/* SYNCED PRODUCTS TABLE */}
+
+{syncedProducts.length > 0 && (
+
+  <div className="mt-12">
+
+    {/* HEADER */}
+
+    <div
+      className="
+       sticky
+top-0
+left-0
+right-0
+        bg-[var(--highlight)]
+        text-white
+        px-6
+        py-4
+        rounded-t-[10px]
+        flex
+        items-center
+        justify-between
+      "
+    >
+
+      <h2
+        className="
+          text-xl
+          font-semibold
+        "
+      >
+        Products Already Synced To Shopify
+      </h2>
+
+      <span
+        className="
+          bg-white/20
+          px-4
+          py-1
+          rounded-full
+          text-sm
+        "
+      >
+        {syncedProducts.length} Products
+      </span>
+
+    </div>
+
+    {/* TABLE */}
+
+    <div
+      className="
+        border
+        border-gray-200
+        border-t-0
+        rounded-b-[10px]
+        p-4
+      "
+    >
+
+      <div
+        className="
+          grid
+          grid-cols-1
+          lg:grid-cols-2
+          gap-5
+        "
+      >
+
+        {syncedProducts.map(
+          (item, index) => (
+
+            <div
+              key={item.id}
+              className="
+                border
+                border-gray-200
+                rounded-[10px]
+                p-4
+                bg-white
+              "
+            >
+
+              {/* SR NO */}
+
+              <div
+                className="
+                  text-sm
+                  text-gray-500
+                  mb-3
+                "
+              >
+                #{index + 1}
+              </div>
+
+              {/* IMAGES */}
+
+             <div
+  className="
+    flex
+    flex-col
+    lg:flex-row
+    gap-4
+    items-start
+  "
+>
+
+  {/* Images */}
+  <div
+    className="
+      flex
+      flex-row
+      gap-3
+      shrink-0
+    "
+  >
+    {(item.generatedModelImages || [])
+      .slice(0, 2)
+      .map((image, imageIndex) => (
+
+        <img
+          key={imageIndex}
+          src={image}
+          alt=""
+          onClick={() =>
+            setPreviewModal(image)
+          }
+          className="
+            w-20
+            h-28
+            rounded-[10px]
+            border
+            border-gray-200
+            object-contain
+            cursor-pointer
+            hover:scale-105
+            transition
+          "
+        />
+
+      ))}
+  </div>
+
+  {/* Title */}
+  <div className="flex-1">
+    <h3
+        className="
+      title-highlight
+      subtitle
+      text-left
+    "
+    >
+      {item.title}
+    </h3>
+  </div>
+
+</div>
+
+             
+
+            </div>
+
+          )
+        )}
+
+      </div>
+
+    </div>
+
+  </div>
+
+)}
+      </div>
 
     );
 
   })()}
 
 </div>
+
+
 
 
 {/* GENERATE POPUP */}
