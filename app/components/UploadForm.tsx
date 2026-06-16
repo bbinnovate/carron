@@ -1327,7 +1327,7 @@ xl:grid-cols-4
 
 </div>
 
-
+{/* mobile  preview box*/}
 <div className="flex gap-3 lg:hidden mt-4">
 
   {/* FRONT PREVIEWS */}
@@ -1366,6 +1366,8 @@ xl:grid-cols-4
                 z-20
                 w-6
                 h-6
+
+                
                 rounded-full
                 bg-black
                 text-white
@@ -1382,8 +1384,8 @@ xl:grid-cols-4
                 w-full
                 h-full
                 object-cover
-                rounded-2xl
-                border
+                 rounded-[10px]
+                
               "
             />
 
@@ -1440,8 +1442,8 @@ xl:grid-cols-4
             w-full
             h-full
             object-cover
-            rounded-2xl
-            border
+             rounded-[10px]
+    
           "
         />
 
@@ -1865,7 +1867,7 @@ xl:grid-cols-4
       window.innerWidth < 768;
 
     const itemsPerPage =
-      isMobile ? 5 : 50;
+      isMobile ? 5 : 25;
       
 
 const visibleProducts =
@@ -3022,17 +3024,18 @@ overflow-hidden
 
 
             {/* PAGINATION */}
-<div className="
-  flex
-  items-center
-  justify-center
-  gap-3
-  p-6
-  
-  border-t
-  border-gray-200
-  bg-white
-">
+  <div
+  className="
+    flex
+    flex-wrap
+    items-center
+    justify-center
+    gap-3
+    py-5
+    px-3
+    border-gray-200
+  "
+>
 
   {/* PREV */}
 
@@ -3043,18 +3046,19 @@ overflow-hidden
         (prev) => prev - 1
       )
     }
-    className="
-    cursor-pointer
-      px-5
-      py-2
-      border
-      border-gray-300
-      rounded-[10px]
-      hover:bg-gray-100
-      transition
-      disabled:opacity-40
-      disabled:cursor-not-allowed
-    "
+     className="
+     cursor-pointer
+  px-3
+  md:px-5
+  py-2
+  border
+  border-gray-300
+  rounded-[10px]
+  hover:bg-gray-100
+  transition
+  disabled:opacity-40
+  disabled:cursor-not-allowed
+"
   >
     Prev
   </button>
@@ -3075,11 +3079,11 @@ overflow-hidden
           )
         }
         className={`
-          px-5
-          py-2
-          rounded-[10px]
-          transition
-          cursor-pointer
+            px-3
+  md:px-5
+  py-2
+  rounded-[10px]
+  cursor-pointer
 
           ${
             currentPage ===
@@ -3110,17 +3114,17 @@ overflow-hidden
       )
     }
     className="
-    cursor-pointer
-      px-5
-      py-2
-      border
-      border-gray-300
-      rounded-[10px]
-      hover:bg-gray-100
-      transition
-      disabled:opacity-40
-      disabled:cursor-not-allowed
-    "
+      cursor-pointer
+        px-5
+        py-2
+        border
+        border-gray-300
+        rounded-[10px]
+        hover:bg-gray-100
+        transition
+        disabled:opacity-40
+        disabled:cursor-not-allowed
+      "
   >
     Next
   </button>
