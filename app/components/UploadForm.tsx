@@ -784,6 +784,7 @@ const handleDeleteSelectedProducts =
       border-dashed
       border-gray-300
       rounded-[10px]
+      lg:px-4
       px-6
       py-12
       md:px-10
@@ -824,8 +825,7 @@ const handleDeleteSelectedProducts =
        title 
         title-highlight
         mb-3
-        whitespace-normal
-    lg:whitespace-nowrap
+       
       "
     >
     Upload 4 Front Images
@@ -973,6 +973,7 @@ xl:grid-cols-4
       border-dashed
       border-gray-300
       rounded-[10px]
+      lg:px-4
       px-6
       py-12
       md:px-10
@@ -1013,8 +1014,8 @@ xl:grid-cols-4
        title 
         title-highlight
         mb-3
-        whitespace-normal
-    lg:whitespace-nowrap
+   
+   
       "
     >
        Upload 1 Back Image
@@ -1136,6 +1137,7 @@ xl:grid-cols-4
 
   {/* mobile  UPLOAD BOX */}
 <div className="flex flex-row gap-3 lg:hidden">
+
    {/* front View UPLOAD BOX */}
  <div className="w-1/2">
   <label
@@ -1186,8 +1188,7 @@ xl:grid-cols-4
        title 
         title-highlight
         mb-3
-        whitespace-normal
-    lg:whitespace-nowrap
+       
       "
     >
     Upload 4 Front Images
@@ -1206,13 +1207,6 @@ xl:grid-cols-4
     Supports PNG, JPG, and WEBP. Max 5MB per image.
   </span>
 
-  {/* <span>
-    Upload up to 4 images at a time for a single product.
-  </span> */}
-
-  {/* <span>
-    Each product generation can take up to 2–3 minutes.
-  </span> */}
 </p>
 
     <input
@@ -1225,6 +1219,9 @@ xl:grid-cols-4
 />
 
   </label>
+
+
+   
 
 </div>
 
@@ -1280,8 +1277,7 @@ xl:grid-cols-4
        title 
         title-highlight
         mb-3
-        whitespace-normal
-    lg:whitespace-nowrap
+
       "
     >
        Upload 1 Back Image
@@ -1325,215 +1321,59 @@ xl:grid-cols-4
 
   </label>
 
-   {/*  back View IMAGE PREVIEW */}
 
-{backImagePreview && (
 
-  <div
-    className="
-      mt-8
-      grid
-      grid-cols-4
-      sm:grid-cols-4
-      md:grid-cols-4
-      lg:grid-cols-4
-      xl:grid-cols-4
-      gap-3
-    "
-  >
+</div>
 
-    <div
-      className="
-        relative
-        aspect-square
-        max-w-[150px]
-      "
-    >
+</div>
 
-      {/* REMOVE BUTTON */}
-      <button
-        type="button"
-        onClick={() => {
-          setBackImage(null);
-          setBackImagePreview("");
-        }}
+
+<div className="flex gap-3 lg:hidden mt-4">
+
+  {/* FRONT PREVIEWS */}
+
+  <div className="w-1/2">
+
+    {previews.length > 0 && (
+
+      <div
         className="
-          absolute
-          -top-2
-          -left-2
-          z-20
-          w-6
-          h-6
-          rounded-full
-          cursor-pointer
-          bg-black
-          text-white
-          text-xs
-          flex
-          items-center
-          justify-center
-          shadow-md
+          grid
+          grid-cols-2
+          gap-3
         "
       >
-        ✕
-      </button>
 
-      <img
-        src={backImagePreview}
-        alt=""
-        className="
-          w-full
-          h-full
-          object-cover
-          rounded-2xl
-          border
-          border-gray-200
-          bg-white
-        "
-      />
-
-    </div>
-
-  </div>
-
-)}
-
-<div
-  className="
-    absolute
-    inset-0
-    z-50
-
-    bg-gray-500/70
-    backdrop-blur-[2px]
-
-    flex
-    items-center
-    justify-center
-
-    rounded-[10px]
-
-    p-3
-    sm:p-4
-  "
->
-  <div
-    className="
-      bg-white
-
-      w-full
-      max-w-[280px]
-      sm:max-w-[320px]
-
-      px-2
-      py-4
-      sm:px-6
-      sm:py-5
-
-      rounded-[10px]
-      shadow-lg
-      text-center
-    "
-  >
-    <h3
-      className="
-        font-semibold
-        text-base
-        sm:text-lg
-        text-gray-900
-      "
-    >
-      Work In Progress
-    </h3>
-
-    <p
-      className="
-        text-xs
-        sm:text-sm
-        text-gray-500
-        mt-2
-        leading-relaxed
-      "
-    >
-      Back image upload is currently disabled.
-    </p>
-  </div>
-</div>
-</div>
-</div>
-    {/*  Front View IMAGE PREVIEW */}
-{previews.length > 0 && (
-
-  <div
-    className="
-    lg:hidden
-      mt-8
-      grid
-      grid-cols-4
-sm:grid-cols-4
-md:grid-cols-4
-lg:grid-cols-4
-xl:grid-cols-4
-      gap-3
-    "
-  >
-
-    {previews.map(
-      (
-        image,
-        index
-      ) => (
-
-        <div
-          key={index}
-          className="
-            relative
-            w-full
-            aspect-square
-          "
-        >
-
-          {/* REMOVE BUTTON */}
-
-          <button
-            type="button"
-            onClick={() =>
-              removePreview(index)
-            }
-            className="
-              absolute
-              -top-2
-              -left-2
-              z-20
-              w-6
-              h-6
-              rounded-full
-              cursor-pointer
-              bg-black
-              text-white
-              text-xs
-              flex
-              items-center
-              justify-center
-              shadow-md
-            "
-          >
-            ✕
-          </button>
-
-          {/* IMAGE BOX */}
+        {previews.map((image, index) => (
 
           <div
+            key={index}
             className="
-              w-full
-              h-full
-              overflow-hidden
-              rounded-2xl
-              border
-              border-gray-200
-              bg-white
+              relative
+              aspect-square
             "
           >
+
+            <button
+              type="button"
+              onClick={() =>
+                removePreview(index)
+              }
+              className="
+                absolute
+                -top-2
+                -left-2
+                z-20
+                w-6
+                h-6
+                rounded-full
+                bg-black
+                text-white
+                text-xs
+              "
+            >
+              ✕
+            </button>
 
             <img
               src={image}
@@ -1542,19 +1382,78 @@ xl:grid-cols-4
                 w-full
                 h-full
                 object-cover
+                rounded-2xl
+                border
               "
             />
 
           </div>
 
-        </div>
+        ))}
 
-      )
+      </div>
+
     )}
 
   </div>
 
-)}
+  {/* BACK PREVIEW */}
+
+  <div className="w-1/2">
+
+    {backImagePreview && (
+
+      <div
+        className="
+          relative
+          w-full
+          aspect-square
+        "
+      >
+
+        <button
+          type="button"
+          onClick={() => {
+            setBackImage(null);
+            setBackImagePreview("");
+          }}
+          className="
+            absolute
+            -top-2
+            -left-2
+            z-20
+            w-6
+            h-6
+            rounded-full
+            bg-black
+            text-white
+            text-xs
+          "
+        >
+          ✕
+        </button>
+
+        <img
+          src={backImagePreview}
+          alt=""
+          className="
+            w-full
+            h-full
+            object-cover
+            rounded-2xl
+            border
+          "
+        />
+
+      </div>
+
+    )}
+
+  </div>
+
+</div>
+
+   
 
  
 
