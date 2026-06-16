@@ -193,9 +193,9 @@ export async function POST(
 
         if (backImage) {
 
-  uploadedModelImages.push(
-    backImage
-  );
+  console.log(
+        "back img",
+      );
 
 }
 

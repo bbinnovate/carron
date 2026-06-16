@@ -36,6 +36,12 @@ interface ProductData {
 }
 export default function UploadForm() {
 
+  const [generationQueue, setGenerationQueue] =
+  useState<any[]>([]);
+
+const [isGenerating, setIsGenerating] =
+  useState(false);
+
   const [loading, setLoading] =
     useState(false);
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
@@ -57,18 +63,22 @@ const [selectedDeleteProducts, setSelectedDeleteProducts] =
     const [selectedGender, setSelectedGender] =
   useState("male");
 
-  const [backgroundType, setBackgroundType] =
-  useState("default");
+
 
 const [selectedBgImage, setSelectedBgImage] =
   useState(
     "https://firebasestorage.googleapis.com/v0/b/bombay-blokes-4c284.firebasestorage.app/o/jk-diamonds%2Fdownload%20(3).jpeg?alt=media&token=8dc81055-a27c-42a3-a94e-6ff13744b464"
   );
 
-  const [selectedBgColor, setSelectedBgColor] =
-  useState("#AAB883");
+const [selectedBgColor, setSelectedBgColor] =
+  useState("#A9B682");
+
+const [backgroundType, setBackgroundType] =
+  useState("solid");
 
   const [currentPage, setCurrentPage] =
+  useState(1);
+  const [syncedCurrentPage, setSyncedCurrentPage] =
   useState(1);
 
   const [backImage, setBackImage] =
@@ -97,6 +107,8 @@ const [bulkSyncLoading, setBulkSyncLoading] =
 const [showSyncPopup, setShowSyncPopup] =
   useState(false);
 
+
+
 const nonDraftProducts =
   products.filter(
     (product) =>
@@ -109,7 +121,86 @@ const allSelected =
     nonDraftProducts.length;
 
 
+    const processNextGeneration =
+  async () => {
 
+    if (
+      generationQueue.length === 0
+    ) {
+      return;
+    }
+
+    setIsGenerating(true);
+
+    const job =
+      generationQueue[0];
+
+    try {
+
+setProducts((prev) =>
+  prev.map((p) =>
+    p.id === job.tempProductId
+      ? {
+          ...p,
+          generationStatus: "generating",
+          startedAt: Date.now(),
+        }
+      : p
+  )
+);
+
+
+
+await axios.post(
+  "/api/generate",
+  {
+    imageUrls: job.uploadedImages,
+    backImage: job.uploadedBackImage,
+    gender: job.gender,
+    backgroundType: job.backgroundType,
+    backgroundColor: job.backgroundColor,
+    backgroundImage: job.backgroundImage,
+  }
+);
+
+     setProducts((prev) =>
+  prev.filter(
+    (p) => p.id !== job.tempProductId
+  )
+);
+
+await fetchProducts();
+
+    } catch (err) {
+
+      console.log(err);
+
+    } finally {
+
+      setGenerationQueue(
+        (prev) => prev.slice(1)
+      );
+
+      setIsGenerating(false);
+    }
+  };
+
+
+useEffect(() => {
+
+  if (
+    isGenerating ||
+    generationQueue.length === 0
+  ) {
+    return;
+  }
+
+  processNextGeneration();
+
+}, [
+  generationQueue,
+  isGenerating,
+]);
 
 const fetchProducts =
   async () => {
@@ -138,9 +229,19 @@ const fetchProducts =
           })
         );
 
-      setProducts(
-        fetchedProducts as unknown as ProductData[]
-      );
+     setProducts((prev) => {
+
+  const tempRows =
+    prev.filter(
+      (p) =>
+        p.id?.startsWith("temp-")
+    );
+
+  return [
+    ...tempRows,
+    ...(fetchedProducts as ProductData[])
+  ];
+});
 
     } catch (error) {
 
@@ -276,6 +377,9 @@ const tempPreview =
 setSelectedFiles([]);
 setPreviews([]);
 
+setBackImage(null);
+setBackImagePreview("");
+
 // TEMP GENERATING ROW
 
 const tempProduct = {
@@ -283,8 +387,6 @@ const tempProduct = {
   id:
     `temp-${Date.now()}`,
 
-  startedAt:
-    Date.now(),
 
   title:
     "Generating Product...",
@@ -298,7 +400,15 @@ const tempProduct = {
       : [],
 
   generationStatus:
-    "generating",
+    isGenerating
+      ? "queued"
+      : "generating",
+
+  startedAt:
+    isGenerating
+      ? undefined
+      : Date.now(),
+
 
   gender:
     selectedGender,
@@ -334,63 +444,21 @@ if (backImage) {
 
       // CALL API
 
-      const response =
-        await axios.post(
-          "/api/generate",
-          {
-             imageUrls:
-        uploadedImages,
+     setGenerationQueue((prev) => [
+  ...prev,
+  {
+    uploadedImages,
+    uploadedBackImage,
+    gender: selectedGender,
+    backgroundType,
+    backgroundColor: selectedBgColor,
+    backgroundImage: selectedBgImage,
+    tempProductId: tempProduct.id,
+  },
+]);
 
-        backImage:
-        uploadedBackImage,
-        
-            gender:
-              selectedGender,
+  
 
-             backgroundType,
-backgroundColor:
-  selectedBgColor,
-
-backgroundImage:
-  selectedBgImage,
-
-
-    
-          }
-        );
-
-      if (
-        !response.data.success
-      ) {
-
-        throw new Error(
-          response.data.message
-        );
-      }
-
-      // REMOVE TEMP ROW
-
-setProducts((prev: any) =>
-  prev.filter(
-    (item: any) =>
-      !String(item.id).startsWith(
-        "temp-"
-      )
-  )
-);
-
-// FETCH REAL PRODUCTS
-
-await fetchProducts();
-
-
-setShowSyncPopup(true);
-
-setTimeout(() => {
-
-  setShowSyncPopup(false);
-
-}, 10000);
 
     } catch (err: any) {
 
@@ -895,13 +963,11 @@ xl:grid-cols-4
 
 
   {/* back View UPLOAD BOX */}
-<div className="hidden lg:flex w-full lg:w-[30%] flex-col gap-4 relative">
+
+<div className="hidden lg:flex w-full lg:w-[30%]  flex-col gap-4">
   <label
     id="backFileUpload"
     className="
-
-    cursor-not-allowed
-    pointer-events-none
     min-h-[320px] h-full
       border-2
       border-dashed
@@ -1064,55 +1130,8 @@ xl:grid-cols-4
   </div>
 
 )}
-
-<div
-  className="
-    absolute
-    inset-0
-    z-50
-
-    bg-gray-500/70
-    backdrop-blur-[2px]
-
-    flex
-    items-center
-    justify-center
-
-    rounded-[10px]
-  "
->
-  <div
-    className="
-      bg-white
-      px-6
-      py-4
-      rounded-[10px]
-      shadow-lg
-      text-center
-    "
-  >
-    <h3
-      className="
-        font-semibold
-        text-lg
-        text-gray-900
-      "
-    >
-      Work In Progress
-    </h3>
-
-    <p
-      className="
-        text-sm
-        text-gray-500
-        mt-1
-      "
-    >
-      Back image upload is currently disabled.
-    </p>
-  </div>
 </div>
-</div>
+
 
 
   {/* mobile  UPLOAD BOX */}
@@ -1216,8 +1235,6 @@ xl:grid-cols-4
  <label
     id="backFileUpload"
     className="
-    cursor-not-allowed
-    pointer-events-none
     min-h-[320px] h-full
       border-2
       border-dashed
@@ -1539,28 +1556,7 @@ xl:grid-cols-4
 
 )}
 
-  {/* ERROR */}
-
-  {error && (
-
-    <div
-      className="
-        mt-8
-        bg-red-100
-        border
-        border-red-300
-        text-red-700
-        px-5
-        py-4
-        rounded-[10px]
-      "
-    >
-
-      {error}
-
-    </div>
-
-  )}
+ 
 
 
 
@@ -1696,53 +1692,54 @@ xl:grid-cols-4
 
     {/* SOLID */}
 
-  <button
-  type="button"
-  onClick={() =>
-    setBackgroundType("solid")
-  }
-  className={`
-    px-6
-    py-4
-    rounded-[10px]
-    border
-    transition
-    cursor-pointer
+{/* SOLID COLORS */}
+
+
+<div
+  className="
     flex
-
-    gap-3
-
-    ${
-      backgroundType === "solid"
-
-        ? "bg-[var(--highlight)] text-white border-black"
-
-        : "bg-white border-gray-200"
-    }
-  `}
+    items-center
+    justify-center
+    gap-4
+    flex-wrap
+  "
 >
+  {[
+    "#A9B682",
+    "#ACD4E4",
+    "#F1B492",
+    "#FFFFFF",
+  ].map((color) => (
+    <button
+      key={color}
+      type="button"
+      onClick={() => {
+        setBackgroundType("solid");
+        setSelectedBgColor(color);
+      }}
+      className={`
+        w-10
+          h-10
+        rounded-full
+        border-2
+        transition-all
+        cursor-pointer
 
-  <div
-    className="
-      w-5
-      h-5
-      rounded-full
-      border
-      border-white/30
-      shrink-0
-      cursor-pointer
-    "
-    style={{
-      background:
-        "#AAB883",
-    }}
-  />
+        ${
+          selectedBgColor === color
+            ? "border-black scale-110 shadow-lg"
+            : "border-gray-200"
+        }
+      `}
+      style={{
+        backgroundColor: color,
+      }}
+    />
+  ))}
+</div>
 
-  <span>
-    Solid Color BG
-  </span>
 
-</button>
+
 
     {/* BG IMAGE */}
 {/* 
@@ -1784,7 +1781,6 @@ xl:grid-cols-4
 </div>
 
 {/* BG IMAGE PICKER */}
-
 {backgroundType === "image" && (
 
   <div
@@ -1894,17 +1890,39 @@ xl:grid-cols-4
       text-center
     "
   >
-    Each product generation can take
-    up to 2–3 minutes.
+  Each product generation can take up to 2–3 minutes and sometimes more.
   </p>
 
 </div>
 
 
 </div>
+
+
 </div>
 
+ {/* ERROR */}
 
+  {error && (
+
+    <div
+      className="
+        mt-8
+        bg-red-100
+        border
+        border-red-300
+        text-red-700
+        px-5
+        py-4
+        rounded-[10px]
+      "
+    >
+
+      {error}
+
+    </div>
+
+  )}
 
 {/* <div
   className="
@@ -1949,17 +1967,57 @@ xl:grid-cols-4
 
     const itemsPerPage =
       isMobile ? 5 : 50;
+      
 
 const visibleProducts =
-  products.filter(
-    (product) =>
-      !product.syncedToShopify
-  );
+  products
+    .filter(
+      (product) =>
+        !product.syncedToShopify
+    )
+    .sort((a, b) => {
+
+      if (
+        a.generationStatus === "generating"
+      ) return -1;
+
+      if (
+        b.generationStatus === "generating"
+      ) return 1;
+
+      if (
+        a.generationStatus === "queued" &&
+        b.generationStatus !== "queued"
+      ) return -1;
+
+      if (
+        b.generationStatus === "queued" &&
+        a.generationStatus !== "queued"
+      ) return 1;
+
+      return 0;
+    });
 
   const syncedProducts =
   products.filter(
     (product) =>
       product.syncedToShopify
+  );
+  const syncedItemsPerPage =
+  isMobile ? 5 : 20;
+
+const syncedTotalPages =
+  Math.ceil(
+    syncedProducts.length /
+    syncedItemsPerPage
+  );
+
+const paginatedSyncedProducts =
+  syncedProducts.slice(
+    (syncedCurrentPage - 1) *
+      syncedItemsPerPage,
+    syncedCurrentPage *
+      syncedItemsPerPage
   );
 
   const totalGeneratedImages =
@@ -2025,22 +2083,14 @@ const paginatedData =
     bg-white
     border
     border-gray-200
-    rounded-[10px]
+     rounded-[10px]
     shadow-sm
-    overflow-visible
-    gap-40
+ 
+  
 
-    max-h-[700px]
-overflow-y-auto
 
-    scrollbar-thin
-    scrollbar-thumb-[var(--highlight)]
-    scrollbar-track-gray-100
+    relative
   "
-  style={{
-    scrollbarWidth: "thin",
-    scrollbarColor: "var(--highlight) #f3f4f6",
-  }}
 >
 
         {/* DESKTOP HEADER */}
@@ -2126,208 +2176,100 @@ overflow-y-auto
 
 </div> */}
 
-      <div
-  className="
-    sticky
-top-0
-left-0
-right-0
-z-50
-    hidden
-    lg:grid
-    lg:grid-cols-[150px_280px_1.2fr_2fr_250px]
-    items-center
-    bg-[var(--highlight)]
-    text-white
-    px-8
-    py-3
-    font-semibold
-    rounded-t-[10px]
-  "
->
-
-
-  
-
 <div
   className="
-    flex
+    hidden
+    lg:grid
+    lg:grid-cols-[120px_200px_1.2fr_2fr_auto]
+    lg:gap-6
+    sticky
+    top-0
+    z-[999]
+    bg-[var(--highlight)]
+    text-white
+    px-6
+    py-4
+    rounded-t-[10px]
+    shadow-md
     items-center
-    gap-4
   "
 >
+  <div className="flex items-center gap-3">
+    <input
+      type="checkbox"
+      checked={allSelected}
+      onChange={handleSelectAll}
+      className="w-5 h-5 cursor-pointer"
+    />
 
-  <input
-    type="checkbox"
-    checked={allSelected}
-    onChange={handleSelectAll}
-    className="
-      w-5
-      h-5
-      cursor-pointer
-    "
-  />
-
-  <div
-    className="
-      flex
-      items-center
-      gap-1
-      whitespace-nowrap
-    "
-  >
-
-    <span
-      className="
-        font-semibold
-      "
-    >
-      All
+    <span className="font-semibold whitespace-nowrap">
+      All | Sr No
     </span>
-
-    <span
-      className="
-        opacity-50
-      "
-    >
-      |
-    </span>
-
-    <span
-      className="
-        font-semibold
-      "
-    >
-      Sr No
-    </span>
-
   </div>
 
-</div>
-
-  <div>
+  <div className="font-semibold">
     Images
   </div>
 
-  <div>
+  <div className="font-semibold">
     Title
   </div>
 
-  <div>
+  <div className="font-semibold">
     Description
   </div>
 
-  <div className="flex justify-end">
-
-
-{/* {selectedDeleteProducts.length > 0 && (
-
-  <button
-    onClick={
-      handleDeleteSelectedProducts
-    }
-
-    className="
-      bg-red-600
-      text-white
-      px-6
-      py-3
-      rounded-[10px]
-      font-semibold
-      hover:bg-red-700
-      transition
-      whitespace-nowrap
-    "
-  >
-    Delete (
-      {selectedDeleteProducts.length}
-    )
-  </button>
-
-)} */}
-
-
-
-  {/* {selectedProducts.length > 0 && (
-
+<div className="font-semibold flex justify-end">
+  {selectedProducts.length > 0 && (
     <button
-      onClick={
-        handleDeleteSelectedProducts
-      }
+      onClick={handleBulkShopifySync}
+      disabled={bulkSyncLoading}
       className="
-        bg-red-600
-        text-white
+        bg-white
+        text-black
         px-6
         py-3
         rounded-[10px]
         font-semibold
-        hover:bg-red-700
+        hover:opacity-90
         transition
         whitespace-nowrap
       "
     >
-      Delete ({selectedProducts.length})
+      {bulkSyncLoading
+        ? "Syncing..."
+        : `Sync (${selectedProducts.length})`}
     </button>
-
-  )} */}
-
-    {selectedProducts.length > 0 && (
-
-      <button
-        onClick={handleBulkShopifySync}
-        disabled={bulkSyncLoading}
-        className="
-          bg-white
-          text-black
-          px-6
-          py-3
-          rounded-[10px]
-          font-semibold
-          hover:opacity-90
-          transition
-          whitespace-nowrap
-        "
-      >
-        {
-          bulkSyncLoading
-            ? "Syncing..."
-            : `Sync (${selectedProducts.length})`
-        }
-      </button>
-
-    )}
-
-  </div>
-
+  )}
+</div>
 </div>
 
 
 
 
 <div
+  className="
+    sticky
+    top-0
+    z-[9999]
 
-className="
-  sticky
-  top-0
-  left-0
-  right-0
-  z-50
+    lg:hidden
 
-  bg-[var(--highlight)]
-  text-white
+    bg-[var(--highlight)]
+    text-white
+     rounded-t-[10px]
+overflow-hidden
 
-  px-4
-  py-3
+    px-4
+    py-3
 
-  rounded-t-[10px]
+    flex
+    items-center
+    justify-between
 
-  flex
-  items-center
-  justify-between
-
-  lg:hidden
-  w-full
-"
+    border-b
+    border-white/20
+  "
 >
 
 <div
@@ -2384,12 +2326,17 @@ className="
  
 
     <div
+      // className="
+      //   text-left
+      //   font-semibold
+      //   text-xl
+      //   md:text-2xl
+      //   leading-none
+      // "
+
       className="
-        text-left
         font-semibold
-        text-xl
-        md:text-2xl
-        leading-none
+        text-base
       "
     >
       Products
@@ -2445,7 +2392,27 @@ className="
 
         {/* TABLE BODY */}
 
-        <div className="w-full">
+        <div
+  onWheel={(e) => {
+    e.currentTarget.scrollTop += e.deltaY;
+  }}
+  className="
+    w-full
+    max-h-screen
+ overflow-y-auto
+    overscroll-contain
+    overflow-hidden
+  
+
+    scrollbar-thin
+    scrollbar-thumb-[var(--highlight)]
+    scrollbar-track-gray-100
+ 
+    
+  "
+>
+
+ 
 
           {paginatedData.length > 0 ? (
 
@@ -2672,7 +2639,7 @@ className="
       "
     />
 
-     {/* {(item.generatedModelImages || []).map(
+      {/* {(item.generatedModelImages || []).map(
     (
       image: string,
       index: number
@@ -2711,7 +2678,7 @@ className="
       />
 
     )
-  )} */}
+  )}  */}
 
   </div>
 
@@ -2741,6 +2708,49 @@ className="
     >
       {item.title}
     </h2>
+
+
+      {item.generationStatus ===
+  "queued" && (
+
+  <div
+    className="
+      absolute
+      inset-0
+      z-20
+
+      flex
+      flex-col
+      items-center
+      justify-center
+
+      backdrop-blur-[2px]
+      bg-white/40
+
+      rounded-[10px]
+      text-center
+
+      px-4
+    "
+  >
+
+    <h2
+      className="
+        text-xl
+        font-semibold
+        title-highlight
+      "
+    >
+     
+  Waiting in Queue
+
+  Previous product is
+  generating first.
+
+    </h2>
+</div>
+
+)}
 
 
 {item.generationStatus ===
@@ -2881,6 +2891,8 @@ className="
   </h2>
 
 
+
+
  {item.generationStatus ===
   "generating" && (
 
@@ -2976,6 +2988,50 @@ className="
 
 )}
 
+
+
+  {item.generationStatus ===
+  "queued" && (
+
+  <div
+    className="
+      absolute
+      inset-0
+      z-20
+
+      flex
+      flex-col
+      items-center
+      justify-center
+
+      backdrop-blur-[2px]
+      bg-white/40
+
+      rounded-[10px]
+      text-center
+
+      px-4
+    "
+  >
+
+    <h2
+      className="
+        text-xl
+        font-semibold
+        title-highlight
+      "
+    >
+     
+  Waiting in Queue
+
+  Previous product is
+  generating first.
+
+    </h2>
+</div>
+
+)}
+
 </div>
 
 {/* DESKTOP DESCRIPTION */}
@@ -3014,6 +3070,13 @@ className="
                 justify-center
                 py-24
                 text-center
+
+                    overflow-y-auto
+
+    scrollbar-thin
+    scrollbar-thumb-[var(--highlight)]
+    scrollbar-track-gray-100
+
               "
             >
 
@@ -3058,23 +3121,19 @@ className="
 
           )}
 
-        </div>
 
-        {/* PAGINATION */}
-
-     
-<div
-  className="
-    flex
-    items-center
-    justify-center
-    gap-3
-    p-6
-    border-t
-    border-gray-200
-    flex-wrap
-  "
->
+            {/* PAGINATION */}
+<div className="
+  flex
+  items-center
+  justify-center
+  gap-3
+  p-6
+  
+  border-t
+  border-gray-200
+  bg-white
+">
 
   {/* PREV */}
 
@@ -3086,6 +3145,7 @@ className="
       )
     }
     className="
+    cursor-pointer
       px-5
       py-2
       border
@@ -3120,6 +3180,7 @@ className="
           py-2
           rounded-[10px]
           transition
+          cursor-pointer
 
           ${
             currentPage ===
@@ -3150,6 +3211,7 @@ className="
       )
     }
     className="
+    cursor-pointer
       px-5
       py-2
       border
@@ -3166,6 +3228,10 @@ className="
 
 </div>
 
+        </div>
+
+       
+
 
 
       </div>
@@ -3173,7 +3239,7 @@ className="
 
 {syncedProducts.length > 0 && (
 
-  <div className="mt-12">
+  <div className="mt-12 ">
 
     {/* HEADER */}
 
@@ -3185,8 +3251,10 @@ left-0
 right-0
         bg-[var(--highlight)]
         text-white
-        px-6
-        py-4
+       lg:px-8
+px-4
+    py-3
+  
         rounded-t-[10px]
         flex
         items-center
@@ -3194,17 +3262,16 @@ right-0
       "
     >
 
-      <h2
-        className="
-          text-xl
-          font-semibold
-        "
-      >
-        Products Already Synced To Shopify
-      </h2>
+      <div>
+    Products Already Synced To Shopify
+  </div>
+
+     
 
       <span
         className="
+         hidden
+    lg:inline-flex
           bg-white/20
           px-4
           py-1
@@ -3215,12 +3282,26 @@ right-0
         {syncedProducts.length} Products
       </span>
 
+       <span
+        className="
+         lg:hidden
+          bg-white/20
+          px-4
+          py-1
+          rounded-full
+          text-sm
+        "
+      >
+        {syncedProducts.length} 
+      </span>
+
     </div>
 
     {/* TABLE */}
 
     <div
       className="
+
         border
         border-gray-200
         border-t-0
@@ -3238,7 +3319,7 @@ right-0
         "
       >
 
-        {syncedProducts.map(
+        {paginatedSyncedProducts.map(
           (item, index) => (
 
             <div
@@ -3336,6 +3417,109 @@ right-0
 
       </div>
 
+{syncedTotalPages > 1 && (
+
+  <div
+  className="
+    flex
+    flex-wrap
+    items-center
+    justify-center
+    gap-3
+    mt-6
+    pt-6
+    px-3
+    border-t
+    border-gray-200
+  "
+>
+
+    <button
+      disabled={syncedCurrentPage === 1}
+      onClick={() =>
+        setSyncedCurrentPage(
+          (prev) => prev - 1
+        )
+      }
+     className="
+     cursor-pointer
+  px-3
+  md:px-5
+  py-2
+  border
+  border-gray-300
+  rounded-[10px]
+  hover:bg-gray-100
+  transition
+  disabled:opacity-40
+  disabled:cursor-not-allowed
+"
+    >
+      Prev
+    </button>
+
+    {Array.from(
+      {
+        length: syncedTotalPages,
+      },
+      (_, index) => (
+
+        <button
+          key={index}
+          onClick={() =>
+            setSyncedCurrentPage(
+              index + 1
+            )
+          }
+         className={`
+  px-3
+  md:px-5
+  py-2
+  rounded-[10px]
+  cursor-pointer
+
+  ${
+    syncedCurrentPage === index + 1
+      ? "bg-[var(--highlight)] text-white"
+      : "border border-gray-300 hover:bg-gray-100"
+  }
+`}
+        >
+          {index + 1}
+        </button>
+
+      )
+    )}
+
+    <button
+      disabled={
+        syncedCurrentPage ===
+        syncedTotalPages
+      }
+      onClick={() =>
+        setSyncedCurrentPage(
+          (prev) => prev + 1
+        )
+      }
+      className="
+      cursor-pointer
+        px-5
+        py-2
+        border
+        border-gray-300
+        rounded-[10px]
+        hover:bg-gray-100
+        transition
+        disabled:opacity-40
+        disabled:cursor-not-allowed
+      "
+    >
+      Next
+    </button>
+
+  </div>
+
+)}
     </div>
 
   </div>

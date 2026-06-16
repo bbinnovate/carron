@@ -55,15 +55,82 @@ export const generateModelImage =
   premium ethnic fashion photography,
   detailed fabric texture visible
   `,
+
+  ...(backImage ? [
+
+`
+BACK VIEW:
+
+MODEL MUST FACE AWAY FROM CAMERA
+
+CRITICAL:
+- camera positioned directly behind model
+- only rear side visible
+- no front garment visible
+- no chest visible
+- no front embroidery visible
+- no front neckline visible
+
+GARMENT ACCURACY:
+- use uploaded BACK IMAGE as source of truth
+- back design must match uploaded back image exactly
+- reproduce exact rear embroidery
+- reproduce exact rear stitching
+- reproduce exact rear neckline
+- reproduce exact rear fabric texture
+- reproduce exact rear garment structure
+- reproduce exact rear silhouette
+- reproduce exact rear color placement
+
+DO NOT:
+- invent any rear design
+- guess rear embroidery
+- use front design on rear side
+- generate a different back pattern
+- modify rear garment details
+
+POSE:
+- standing straight
+- arms relaxed
+- full body visible
+- head to toe visible
+- centered composition
+
+OUTPUT:
+- premium ecommerce catalog photography
+- professional studio quality
+- rear garment fully visible
+`
+
+] : [])
 ];
-let colorDescription = "";
 
-if (
-  backgroundColor === "#EBB392"
-) {
+let colorDescription = "neutral studio backdrop";
 
-  colorDescription =
-    "soft peach beige luxury backdrop";
+switch (backgroundColor?.toUpperCase()) {
+  case "#A9B682":
+    colorDescription =
+      "soft sage green luxury backdrop";
+    break;
+
+  case "#ACD4E4":
+    colorDescription =
+      "soft pastel blue luxury backdrop";
+    break;
+
+  case "#F1B492":
+    colorDescription =
+      "soft peach beige luxury backdrop";
+    break;
+
+  case "#FFFFFF":
+    colorDescription =
+      "pure white seamless studio backdrop";
+    break;
+
+  default:
+    colorDescription =
+      "neutral luxury studio backdrop";
 }
     const images: string[] = [];
 
@@ -118,16 +185,15 @@ else if (
   backgroundType === "solid"
 ) {
 
-  backgroundPrompt = `
-
+backgroundPrompt = `
 Scene:
 - plain solid color background
-- ${colorDescription}
+- background color exactly ${backgroundColor}
 - perfectly uniform backdrop
+- use this exact hex color ${backgroundColor}
 - no gradients
 - no texture
-- no shadows
-- flat catalog background
+- flat studio catalog background
 `;
 
 }
@@ -185,6 +251,18 @@ IMPORTANT:
 - same hairstyle in all images
 - same human in all generations
 
+- First reference image is FRONT VIEW of the garment
+- Second reference image is BACK VIEW of the garment
+- Use BOTH images to understand the complete outfit
+- Preserve front design exactly
+- Preserve back design exactly
+- Preserve rear embroidery exactly
+- Preserve rear stitching exactly
+- Preserve rear neckline exactly
+- Preserve rear fabric folds exactly
+- Never invent the back side
+- Back side must match uploaded back reference image
+
 POSE:
 ${angle}
 
@@ -229,6 +307,9 @@ CRITICAL:
                     parts: [
 
 
+                      
+
+
                       ...(backgroundType === "image"
   ? [
       {
@@ -250,10 +331,21 @@ CRITICAL:
                           mimeType:
                             "image/jpeg",
 
-                         fileUri:
-  referenceImage,
+                         fileUri: referenceImage,
                         },
                       },
+
+
+                      ...(backImage
+  ? [
+      {
+        fileData: {
+          mimeType: "image/jpeg",
+          fileUri: backImage,
+        },
+      },
+    ]
+  : []),
 
                       // PROMPT
 
@@ -281,29 +373,34 @@ CRITICAL:
 
         let imageGenerated = false;
 
+let addedImageForThisAngle = false;
+
 for (const part of parts || []) {
 
-  if (
-    part?.inlineData?.data
-  ) {
+  if (!part?.inlineData?.data) {
+    continue;
+  }
 
-    imageGenerated = true;
+  // TAKE ONLY FIRST IMAGE
+  if (addedImageForThisAngle) {
+    continue;
+  }
 
-    const generatedImage =
-      `data:image/png;base64,${part.inlineData.data}`;
+  addedImageForThisAngle = true;
+  imageGenerated = true;
 
-    images.push(
+  const generatedImage =
+    `data:image/png;base64,${part.inlineData.data}`;
+
+  images.push(generatedImage);
+
+  const uploadedReference =
+    await uploadBase64Image(
       generatedImage
     );
 
-    const uploadedReference =
-      await uploadBase64Image(
-        generatedImage
-      );
-
-    referenceImage =
-      uploadedReference;
-  }
+  referenceImage =
+    uploadedReference;
 }
 
 if (imageGenerated) {
@@ -337,9 +434,40 @@ await sleep(2000);
           throw error;
         }
       }
+
+
+      const isBackView =
+  angle.includes("BACK VIEW");
     }
 
+
+    const imageParts = [
+
+  {
+    fileData: {
+      mimeType: "image/jpeg",
+      fileUri: imageUrl,
+    },
+  },
+
+];
+
+
+const expectedCount =
+  backImage ? 4 : 3;
+
+if (
+  images.length < expectedCount
+) {
+  throw new Error(
+    `Expected ${expectedCount} images but got ${images.length}`
+  );
+}
+
     return {
-      images,
-    };
+  images: images.slice(
+    0,
+    backImage ? 4 : 3
+  ),
+};
 };
