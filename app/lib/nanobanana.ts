@@ -294,9 +294,57 @@ CRITICAL:
 `;
 
 
- console.log("REFERENCE:", referenceImage);
-console.log("BACK:", backImage);
-console.log("BACKGROUND:", backgroundImage);
+try {
+  const res = await axios.get(
+    referenceImage
+  );
+
+  console.log(
+    "REFERENCE STATUS:",
+    res.status
+  );
+} catch (err) {
+  console.log(
+    "REFERENCE FAILED"
+  );
+}
+
+if (backImage) {
+  try {
+    const res = await axios.get(
+      backImage
+    );
+
+    console.log(
+      "BACK STATUS:",
+      res.status
+    );
+  } catch (err) {
+    console.log(
+      "BACK FAILED"
+    );
+  }
+}
+
+if (
+  backgroundType === "image" &&
+  backgroundImage
+) {
+  try {
+    const res = await axios.get(
+      backgroundImage
+    );
+
+    console.log(
+      "BACKGROUND STATUS:",
+      res.status
+    );
+  } catch (err) {
+    console.log(
+      "BACKGROUND FAILED"
+    );
+  }
+}
 
           const response =
             await axios.post(
