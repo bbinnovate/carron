@@ -417,7 +417,8 @@ for (const part of parts || []) {
 
     await sleep(5000);
 
-referenceImage = imageUrl;
+  referenceImage =
+    uploadedReference;
 
 }
 
