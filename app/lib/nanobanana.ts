@@ -352,16 +352,16 @@ if (backImage) {
                       },
 
 
-  //                     ...(backImage
-  // ? [
-  //     {
-  //       fileData: {
-  //         mimeType: "image/jpeg",
-  //         fileUri: backImage,
-  //       },
-  //     },
-  //   ]
-  // : []),
+                      ...(backImage
+  ? [
+      {
+        fileData: {
+          mimeType: "image/jpeg",
+          fileUri: backImage,
+        },
+      },
+    ]
+  : []),
 
                       // PROMPT
 
@@ -417,8 +417,7 @@ for (const part of parts || []) {
 
     await sleep(5000);
 
-  referenceImage =
-    uploadedReference;
+referenceImage = imageUrl;
 
 }
 
