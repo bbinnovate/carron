@@ -373,7 +373,7 @@ console.log(
   ? [
       {
         fileData: {
-          mimeType: "image/jpeg",
+           mimeType: "image/png",
           fileUri: modelReference,
         },
       },
@@ -455,10 +455,26 @@ const uploadedReference =
 modelReference =
   uploadedReference;
 
-
+await sleep(8000);
 
 
 }
+
+
+console.log(
+  "MODEL REF:",
+  modelReference
+);
+
+const test =
+  await axios.head(
+    modelReference
+  );
+
+console.log(
+  "MODEL REF STATUS:",
+  test.status
+);
 
 if (imageGenerated) {
 
