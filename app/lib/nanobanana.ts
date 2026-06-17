@@ -100,6 +100,19 @@ OUTPUT:
 - premium ecommerce catalog photography
 - professional studio quality
 - rear garment fully visible
+
+BACK IMAGE IS THE HIGHEST PRIORITY REFERENCE.
+
+For the back view:
+- ignore front garment rear assumptions
+- use uploaded BACK IMAGE exactly
+- copy embroidery placement exactly
+- copy collar shape exactly
+- copy seam placement exactly
+- copy fabric texture exactly
+- copy rear silhouette exactly
+
+The back garment image overrides all other garment references.
 `
 
 ] : [])
@@ -352,6 +365,9 @@ console.log(
   angle
 );
 
+const isBackView =
+  angle.includes("BACK VIEW");
+
           const response =
             await axios.post(
 
@@ -396,22 +412,24 @@ console.log(
 {
   fileData: {
     mimeType: "image/jpeg",
-    fileUri: garmentReference,
+    fileUri: isBackView
+      ? backImage
+      : garmentReference,
   },
 },
 
 
-//                      ...(angle.includes("BACK VIEW") &&
-// backImage
-//   ? [
-//       {
-//         fileData: {
-//           mimeType: "image/jpeg",
-//           fileUri: backImage,
-//         },
-//       },
-//     ]
-//   : []),
+...(angle.includes("BACK VIEW") &&
+backImage
+  ? [
+      {
+        fileData: {
+          mimeType: "image/jpeg",
+          fileUri: backImage,
+        },
+      },
+    ]
+  : []),
 
                       // PROMPT
 
