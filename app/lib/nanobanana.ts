@@ -409,7 +409,7 @@ const isBackView =
   ? [
       {
         fileData: {
-          mimeType: "image/jpeg",
+          mimeType: "image/png",
           fileUri: modelReference,
         },
       },
@@ -418,7 +418,7 @@ const isBackView =
 
 {
   fileData: {
-    mimeType: "image/jpeg",
+    mimeType: "image/png",
     fileUri: garmentReference,
   },
 },
@@ -427,7 +427,7 @@ const isBackView =
   ? [
       {
         fileData: {
-          mimeType: "image/jpeg",
+          mimeType: "image/png",
           fileUri: backImage,
         },
       },
