@@ -137,7 +137,7 @@ switch (backgroundColor?.toUpperCase()) {
     // THIS WILL KEEP SAME MODEL
 
     let garmentReference = imageUrl;
-let modelReference = "";
+
 
     for (const angle of angles) {
 
@@ -316,14 +316,15 @@ Do not invent rear details.
 `;
 
 
+
 console.log(
-  "MODEL REF:",
-  modelReference
+  "FRONT:",
+  garmentReference
 );
 
 console.log(
-  "GARMENT REF:",
-  garmentReference
+  "BACK:",
+  backImage
 );
 
           const response =
@@ -361,23 +362,21 @@ console.log(
                           mimeType:
                             "image/jpeg",
 
-                          fileUri:
-      modelReference ||
-      garmentReference,
+                          fileUri: garmentReference,
                         },
                       },
 
 
-  //                     ...(backImage
-  // ? [
-  //     {
-  //       fileData: {
-  //         mimeType: "image/jpeg",
-  //         fileUri: backImage,
-  //       },
-  //     },
-  //   ]
-  // : []),
+                      ...(backImage
+  ? [
+      {
+        fileData: {
+          mimeType: "image/jpeg",
+          fileUri: backImage,
+        },
+      },
+    ]
+  : []),
 
                       // PROMPT
 
@@ -431,12 +430,8 @@ const uploadedReference =
     generatedImage
   );
 
-await sleep(5000);
 
-if (!modelReference) {
-  modelReference =
-    uploadedReference;
-}
+
 
 
 
