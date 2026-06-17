@@ -136,8 +136,8 @@ switch (backgroundColor?.toUpperCase()) {
 
     // THIS WILL KEEP SAME MODEL
 
-    let garmentReference = imageUrl;
-
+let garmentReference = imageUrl;
+let modelReference = "";
 
     for (const angle of angles) {
 
@@ -313,6 +313,18 @@ Recreate rear stitching exactly.
 Recreate rear fabric texture exactly.
 Do not invent rear details.
 
+
+
+REFERENCE HIERARCHY:
+
+1. Previous generated model image = source of identity
+2. Front garment image = source of garment details
+3. Back garment image = source of rear details
+
+Never change identity.
+Never change background.
+Never change lighting.
+
 `;
 
 
@@ -357,17 +369,27 @@ console.log(
 
                       // REFERENCE IMAGE
 
-                      {
-                        fileData: {
-                          mimeType:
-                            "image/jpeg",
+                      ...(modelReference
+  ? [
+      {
+        fileData: {
+          mimeType: "image/jpeg",
+          fileUri: modelReference,
+        },
+      },
+    ]
+  : []),
 
-                          fileUri: garmentReference,
-                        },
-                      },
+{
+  fileData: {
+    mimeType: "image/jpeg",
+    fileUri: garmentReference,
+  },
+},
 
 
-                      ...(backImage
+                     ...(angle.includes("BACK VIEW") &&
+backImage
   ? [
       {
         fileData: {
@@ -430,7 +452,8 @@ const uploadedReference =
     generatedImage
   );
 
-
+modelReference =
+  uploadedReference;
 
 
 
@@ -469,9 +492,6 @@ await sleep(2000);
         }
       }
 
-
-      const isBackView =
-  angle.includes("BACK VIEW");
     }
 
 
