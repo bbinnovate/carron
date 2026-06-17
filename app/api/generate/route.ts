@@ -204,23 +204,27 @@ export async function POST(
 
     } catch (nanoError: any) {
 
-      console.log(
-        "NANO BANANA ERROR:",
-        nanoError?.response?.data ||
-        nanoError
-      );
+  console.log(
+    "NANO BANANA ERROR:",
+    nanoError?.response?.data ||
+    nanoError
+  );
 
-      return NextResponse.json(
-        {
-          success: false,
-          message:
-            "Nano Banana image generation failed",
-        },
-        {
-          status: 500,
-        }
-      );
+  return NextResponse.json(
+    {
+      success: false,
+
+      message:
+        nanoError?.response?.data?.error?.message ||
+        nanoError?.message ||
+        "Nano Banana image generation failed",
+    },
+    {
+      status:
+        nanoError?.response?.status || 500,
     }
+  );
+}
 
     // FINAL DATA
 

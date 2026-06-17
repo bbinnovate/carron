@@ -171,11 +171,17 @@ await axios.post(
 
 await fetchProducts();
 
-    } catch (err) {
+    } catch (err: any) {
 
-      console.log(err);
+  console.log(err);
 
-    } finally {
+  setError(
+    err?.response?.data?.message ||
+    err?.message ||
+    "Generation Failed"
+  );
+
+} finally {
 
       setGenerationQueue(
         (prev) => prev.slice(1)
