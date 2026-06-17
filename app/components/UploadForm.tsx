@@ -1791,7 +1791,7 @@ xl:grid-cols-4
       text-center
     "
   >
-  Each product generation can take up to 2–3 minutes and sometimes more.
+  Product Image Generation will take ~ 5–7 minutes. Incase you have added a back image ~ 8-10 mins. Please wait or come back later.
   </p>
 
 </div>
@@ -2540,7 +2540,7 @@ overflow-hidden
       "
     />
 
-      {(item.generatedModelImages || []).map(
+      {/* {(item.generatedModelImages || []).map(
     (
       image: string,
       index: number
@@ -2579,7 +2579,7 @@ overflow-hidden
       />
 
     )
-  )} 
+  )}  */}
 
   </div>
 
@@ -2781,7 +2781,7 @@ overflow-hidden
 
 <div className="hidden lg:block">
 
-  {/* <h2
+  <h2
     className="
       title-highlight
       subtitle
@@ -2789,7 +2789,7 @@ overflow-hidden
     "
   >
     {item.title}
-  </h2> */}
+  </h2>
 
 
 
@@ -3497,12 +3497,8 @@ px-4
     subtitle 
         "
       >
-        AI Product Generation
-        will take around
-        2–3 minutes.
+          Product Image Generation will take ~ 5–7 minutes. Incase you have added a back image ~ 8-10 mins. Please wait or come back later.
 
-        Please wait or
-        come back later.
       </p>
 
     </div>
