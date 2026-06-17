@@ -136,8 +136,8 @@ switch (backgroundColor?.toUpperCase()) {
 
     // THIS WILL KEEP SAME MODEL
 
-    let referenceImage =
-      imageUrl;
+    let garmentReference = imageUrl;
+let modelReference = "";
 
     for (const angle of angles) {
 
@@ -274,6 +274,19 @@ Framing:
 
 ${backgroundPrompt}
 
+REFERENCE MODEL RULE:
+
+The uploaded reference image contains the exact model identity.
+
+Use the same face.
+Use the same skin tone.
+Use the same hairstyle.
+Use the same body shape.
+Use the same age.
+Use the same model in every image.
+
+Never generate a different person.
+
 CRITICAL:
 - KEEP SAME EXACT MODEL in all generated images
 - SAME FACE
@@ -289,28 +302,29 @@ CRITICAL:
 
 
 
+BACK GARMENT REFERENCE:
 
+Use the uploaded back garment image
+as source of truth.
+
+Recreate rear embroidery exactly.
+Recreate rear neckline exactly.
+Recreate rear stitching exactly.
+Recreate rear fabric texture exactly.
+Do not invent rear details.
 
 `;
 
 
-const frontHead =
-  await axios.head(referenceImage);
-
 console.log(
-  "FRONT TYPE:",
-  frontHead.headers["content-type"]
+  "MODEL REF:",
+  modelReference
 );
 
-if (backImage) {
-  const backHead =
-    await axios.head(backImage);
-
-  console.log(
-    "BACK TYPE:",
-    backHead.headers["content-type"]
-  );
-}
+console.log(
+  "GARMENT REF:",
+  garmentReference
+);
 
           const response =
             await axios.post(
@@ -347,21 +361,23 @@ if (backImage) {
                           mimeType:
                             "image/jpeg",
 
-                         fileUri: referenceImage,
+                          fileUri:
+      modelReference ||
+      garmentReference,
                         },
                       },
 
 
-                      ...(backImage
-  ? [
-      {
-        fileData: {
-          mimeType: "image/jpeg",
-          fileUri: backImage,
-        },
-      },
-    ]
-  : []),
+  //                     ...(backImage
+  // ? [
+  //     {
+  //       fileData: {
+  //         mimeType: "image/jpeg",
+  //         fileUri: backImage,
+  //       },
+  //     },
+  //   ]
+  // : []),
 
                       // PROMPT
 
@@ -410,14 +426,19 @@ for (const part of parts || []) {
 
   images.push(generatedImage);
 
-  const uploadedReference =
-    await uploadBase64Image(
-      generatedImage
-    );
+const uploadedReference =
+  await uploadBase64Image(
+    generatedImage
+  );
 
-    await sleep(5000);
+await sleep(5000);
 
-referenceImage = imageUrl;
+if (!modelReference) {
+  modelReference =
+    uploadedReference;
+}
+
+
 
 }
 
@@ -459,17 +480,7 @@ await sleep(2000);
     }
 
 
-    const imageParts = [
-
-  {
-    fileData: {
-      mimeType: "image/jpeg",
-      fileUri: imageUrl,
-    },
-  },
-
-];
-
+  
 
 const expectedCount =
   backImage ? 4 : 3;
