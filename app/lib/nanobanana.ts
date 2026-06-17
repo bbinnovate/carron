@@ -405,14 +405,34 @@ const isBackView =
 
                     
 
+...(modelReference
+  ? [
+      {
+        fileData: {
+          mimeType: "image/jpeg",
+          fileUri: modelReference,
+        },
+      },
+    ]
+  : []),
+
 {
   fileData: {
     mimeType: "image/jpeg",
-   fileUri: isBackView
-      ? backImage
-      : garmentReference,
+    fileUri: garmentReference,
   },
 },
+
+...(isBackView && backImage
+  ? [
+      {
+        fileData: {
+          mimeType: "image/jpeg",
+          fileUri: backImage,
+        },
+      },
+    ]
+  : []),
 
 
 
@@ -464,8 +484,13 @@ for (const part of parts || []) {
 
   images.push(generatedImage);
 
+const uploadedModel =
+  await uploadBase64Image(
+    generatedImage
+  );
+
 modelReference =
-  part.inlineData.data;
+  uploadedModel;
 
 
 
@@ -475,23 +500,6 @@ modelReference =
 
 }
 
-
-
-
-console.log(
-  "MODEL REF:",
-  modelReference
-);
-
-const test =
-  await axios.head(
-    modelReference
-  );
-
-console.log(
-  "MODEL REF STATUS:",
-  test.status
-);
 
 if (imageGenerated) {
 
