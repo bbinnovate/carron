@@ -1696,8 +1696,8 @@ xl:grid-cols-4
   >
 
     {[
-      "https://firebasestorage.googleapis.com/v0/b/bombay-blokes-4c284.firebasestorage.app/o/jk-diamonds%2Fdownload%20(3).jpeg?alt=media&token=8dc81055-a27c-42a3-a94e-6ff13744b464",
-      "https://firebasestorage.googleapis.com/v0/b/bombay-blokes-4c284.firebasestorage.app/o/jk-diamonds%2Fdownload%20(2).jpeg?alt=media&token=981c862e-48c9-4279-8f7b-74438b9c9cfd",
+      "https://firebasestorage.googleapis.com/v0/b/carron-2c466.firebasestorage.app/o/generated%2Fdownload%20(2).jpeg?alt=media&token=9eaa018e-931b-4611-9353-969a5db80f86",
+      "https://firebasestorage.googleapis.com/v0/b/carron-2c466.firebasestorage.app/o/generated%2Fdownload%20(3).jpeg?alt=media&token=c223270a-bafb-4370-9435-6f0337dc4093",
     ].map((bg) => (
 
       <button
