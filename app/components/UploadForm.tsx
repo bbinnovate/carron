@@ -334,7 +334,7 @@ const getRemainingTime = (
     Date.now();
 
   const diff =
-    180 -
+    300 -
     Math.floor(
       (now - createdAt) / 1000
     );
@@ -367,7 +367,7 @@ const handleGenerate =
 
 setTimeout(() => {
   setShowGeneratePopup(false);
-}, 180000); // 3 minutes
+}, 300000); // 5 minutes
 
       // RESET FORM INSTANTLY
 
