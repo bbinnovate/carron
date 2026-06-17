@@ -2540,7 +2540,7 @@ overflow-hidden
       "
     />
 
-      {/* {(item.generatedModelImages || []).map(
+      {(item.generatedModelImages || []).map(
     (
       image: string,
       index: number
@@ -2579,7 +2579,7 @@ overflow-hidden
       />
 
     )
-  )}  */}
+  )} 
 
   </div>
 
@@ -2781,7 +2781,7 @@ overflow-hidden
 
 <div className="hidden lg:block">
 
-  <h2
+  {/* <h2
     className="
       title-highlight
       subtitle
@@ -2789,7 +2789,7 @@ overflow-hidden
     "
   >
     {item.title}
-  </h2>
+  </h2> */}
 
 
 

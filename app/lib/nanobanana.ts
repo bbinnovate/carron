@@ -401,8 +401,12 @@ for (const part of parts || []) {
       generatedImage
     );
 
+    await sleep(5000);
+
   referenceImage =
     uploadedReference;
+
+    fileUri: referenceImage
 }
 
 if (imageGenerated) {
