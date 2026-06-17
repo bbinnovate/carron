@@ -11,6 +11,57 @@ const sleep = (
       setTimeout(resolve, ms)
   );
 
+const imageUrlToInlineData =
+  async (url: string) => {
+
+    const dataUrlMatch =
+      url.match(
+        /^data:(.*?);base64,(.*)$/
+      );
+
+    if (dataUrlMatch) {
+
+      return {
+        inlineData: {
+          mimeType:
+            dataUrlMatch[1] ||
+            "image/png",
+          data:
+            dataUrlMatch[2],
+        },
+      };
+    }
+
+    const response =
+      await axios.get(
+        url,
+        {
+          responseType:
+            "arraybuffer",
+        }
+      );
+
+    const contentType =
+      response.headers[
+        "content-type"
+      ];
+
+    const mimeType =
+      typeof contentType === "string"
+        ? contentType.split(";")[0]
+        : "image/jpeg";
+
+    return {
+      inlineData: {
+        mimeType,
+        data:
+          Buffer.from(
+            response.data
+          ).toString("base64"),
+      },
+    };
+  };
+
 export const generateModelImage =
   async (
     prompt: string,
@@ -139,7 +190,27 @@ switch (backgroundColor?.toUpperCase()) {
     let referenceImage =
       imageUrl;
 
+    const backImagePart =
+      backImage
+        ? await imageUrlToInlineData(
+            backImage
+          )
+        : null;
+
+    const backgroundImagePart =
+      backgroundType === "image" &&
+      backgroundImage
+        ? await imageUrlToInlineData(
+            backgroundImage
+          )
+        : null;
+
     for (const angle of angles) {
+
+      const referenceImagePart =
+        await imageUrlToInlineData(
+          referenceImage
+        );
 
       let retries = 3;
 
@@ -310,41 +381,19 @@ CRITICAL:
                       
 
 
-                      ...(backgroundType === "image"
-  ? [
-      {
-        fileData: {
-          mimeType:
-            "image/jpeg",
-
-          fileUri:
-            backgroundImage,
-        },
-      },
-    ]
+                      ...(backgroundType === "image" &&
+  backgroundImagePart
+  ? [backgroundImagePart]
   : []),
 
                       // REFERENCE IMAGE
 
-                      {
-                        fileData: {
-                          mimeType:
-                            "image/jpeg",
-
-                         fileUri: referenceImage,
-                        },
-                      },
+                      referenceImagePart,
 
 
-                      ...(backImage
-  ? [
-      {
-        fileData: {
-          mimeType: "image/jpeg",
-          fileUri: backImage,
-        },
-      },
-    ]
+                      ...(backImage &&
+  backImagePart
+  ? [backImagePart]
   : []),
 
                       // PROMPT
