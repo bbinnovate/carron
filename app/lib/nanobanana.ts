@@ -339,6 +339,19 @@ console.log(
   backImage
 );
 
+
+if (angle.includes("BACK VIEW")) {
+  console.log(
+    "USING BACK IMAGE:",
+    backImage
+  );
+}
+
+console.log(
+  "ANGLE:",
+  angle
+);
+
           const response =
             await axios.post(
 
@@ -388,17 +401,17 @@ console.log(
 },
 
 
-                     ...(angle.includes("BACK VIEW") &&
-backImage
-  ? [
-      {
-        fileData: {
-          mimeType: "image/jpeg",
-          fileUri: backImage,
-        },
-      },
-    ]
-  : []),
+//                      ...(angle.includes("BACK VIEW") &&
+// backImage
+//   ? [
+//       {
+//         fileData: {
+//           mimeType: "image/jpeg",
+//           fileUri: backImage,
+//         },
+//       },
+//     ]
+//   : []),
 
                       // PROMPT
 
