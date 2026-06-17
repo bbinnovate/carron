@@ -100,19 +100,6 @@ OUTPUT:
 - premium ecommerce catalog photography
 - professional studio quality
 - rear garment fully visible
-
-BACK IMAGE IS THE HIGHEST PRIORITY REFERENCE.
-
-For the back view:
-- ignore front garment rear assumptions
-- use uploaded BACK IMAGE exactly
-- copy embroidery placement exactly
-- copy collar shape exactly
-- copy seam placement exactly
-- copy fabric texture exactly
-- copy rear silhouette exactly
-
-The back garment image overrides all other garment references.
 `
 
 ] : [])
@@ -149,8 +136,8 @@ switch (backgroundColor?.toUpperCase()) {
 
     // THIS WILL KEEP SAME MODEL
 
-let garmentReference = imageUrl;
-let modelReference = "";
+    let referenceImage =
+      imageUrl;
 
     for (const angle of angles) {
 
@@ -287,19 +274,6 @@ Framing:
 
 ${backgroundPrompt}
 
-REFERENCE MODEL RULE:
-
-The uploaded reference image contains the exact model identity.
-
-Use the same face.
-Use the same skin tone.
-Use the same hairstyle.
-Use the same body shape.
-Use the same age.
-Use the same model in every image.
-
-Never generate a different person.
-
 CRITICAL:
 - KEEP SAME EXACT MODEL in all generated images
 - SAME FACE
@@ -315,63 +289,12 @@ CRITICAL:
 
 
 
-BACK GARMENT REFERENCE:
 
-Use the uploaded back garment image
-as source of truth.
-
-Recreate rear embroidery exactly.
-Recreate rear neckline exactly.
-Recreate rear stitching exactly.
-Recreate rear fabric texture exactly.
-Do not invent rear details.
-
-
-
-REFERENCE HIERARCHY:
-
-1. Previous generated model image = source of identity
-2. Front garment image = source of garment details
-3. Back garment image = source of rear details
-
-Never change identity.
-Never change background.
-Never change lighting.
 
 `;
 
 
-
-console.log(
-  "FRONT:",
-  garmentReference
-);
-
-console.log(
-  "BACK:",
-  backImage
-);
-
-
-if (angle.includes("BACK VIEW")) {
-  console.log(
-    "USING BACK IMAGE:",
-    backImage
-  );
-}
-
-console.log(
-  "ANGLE:",
-  angle
-);
-
-const isBackView =
-  angle.includes("BACK VIEW");
-
-
-
-
-
+ 
 
           const response =
             await axios.post(
@@ -403,39 +326,26 @@ const isBackView =
 
                       // REFERENCE IMAGE
 
-                    
+                      {
+                        fileData: {
+                          mimeType:
+                            "image/jpeg",
 
-...(modelReference
+                         fileUri: referenceImage,
+                        },
+                      },
+
+
+                      ...(backImage
   ? [
       {
         fileData: {
-          mimeType: "image/png",
-          fileUri: modelReference,
-        },
-      },
-    ]
-  : []),
-
-{
-  fileData: {
-    mimeType: "image/png",
-    fileUri: garmentReference,
-  },
-},
-
-...(isBackView && backImage
-  ? [
-      {
-        fileData: {
-          mimeType: "image/png",
+          mimeType: "image/jpeg",
           fileUri: backImage,
         },
       },
     ]
   : []),
-
-
-
 
                       // PROMPT
 
@@ -484,22 +394,14 @@ for (const part of parts || []) {
 
   images.push(generatedImage);
 
-const uploadedModel =
-  await uploadBase64Image(
-    generatedImage
-  );
+  const uploadedReference =
+    await uploadBase64Image(
+      generatedImage
+    );
 
-modelReference =
-  uploadedModel;
-
-
-
-
-
-
-
+  referenceImage =
+    uploadedReference;
 }
-
 
 if (imageGenerated) {
 
@@ -533,10 +435,23 @@ await sleep(2000);
         }
       }
 
+
+      const isBackView =
+  angle.includes("BACK VIEW");
     }
 
 
-  
+    const imageParts = [
+
+  {
+    fileData: {
+      mimeType: "image/jpeg",
+      fileUri: imageUrl,
+    },
+  },
+
+];
+
 
 const expectedCount =
   backImage ? 4 : 3;
