@@ -294,56 +294,22 @@ CRITICAL:
 `;
 
 
-try {
-  const res = await axios.get(
-    referenceImage
-  );
+const frontHead =
+  await axios.head(referenceImage);
 
-  console.log(
-    "REFERENCE STATUS:",
-    res.status
-  );
-} catch (err) {
-  console.log(
-    "REFERENCE FAILED"
-  );
-}
+console.log(
+  "FRONT TYPE:",
+  frontHead.headers["content-type"]
+);
 
 if (backImage) {
-  try {
-    const res = await axios.get(
-      backImage
-    );
+  const backHead =
+    await axios.head(backImage);
 
-    console.log(
-      "BACK STATUS:",
-      res.status
-    );
-  } catch (err) {
-    console.log(
-      "BACK FAILED"
-    );
-  }
-}
-
-if (
-  backgroundType === "image" &&
-  backgroundImage
-) {
-  try {
-    const res = await axios.get(
-      backgroundImage
-    );
-
-    console.log(
-      "BACKGROUND STATUS:",
-      res.status
-    );
-  } catch (err) {
-    console.log(
-      "BACKGROUND FAILED"
-    );
-  }
+  console.log(
+    "BACK TYPE:",
+    backHead.headers["content-type"]
+  );
 }
 
           const response =
@@ -386,16 +352,16 @@ if (
                       },
 
 
-                      ...(backImage
-  ? [
-      {
-        fileData: {
-          mimeType: "image/jpeg",
-          fileUri: backImage,
-        },
-      },
-    ]
-  : []),
+  //                     ...(backImage
+  // ? [
+  //     {
+  //       fileData: {
+  //         mimeType: "image/jpeg",
+  //         fileUri: backImage,
+  //       },
+  //     },
+  //   ]
+  // : []),
 
                       // PROMPT
 
@@ -451,10 +417,8 @@ for (const part of parts || []) {
 
     await sleep(5000);
 
-  referenceImage =
-    uploadedReference;
+referenceImage = imageUrl;
 
-    fileUri: referenceImage
 }
 
 if (imageGenerated) {
