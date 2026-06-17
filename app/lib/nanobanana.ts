@@ -294,7 +294,9 @@ CRITICAL:
 `;
 
 
- 
+ console.log("REFERENCE:", referenceImage);
+console.log("BACK:", backImage);
+console.log("BACKGROUND:", backgroundImage);
 
           const response =
             await axios.post(
