@@ -151,6 +151,9 @@ switch (backgroundColor?.toUpperCase()) {
 
 let garmentReference = imageUrl;
 let modelReference = "";
+let firstModelReference = "";
+
+
 
     for (const angle of angles) {
 
@@ -368,6 +371,23 @@ console.log(
 const isBackView =
   angle.includes("BACK VIEW");
 
+
+
+
+
+
+  if (modelReference) {
+  const check =
+    await axios.head(
+      modelReference
+    );
+
+  console.log(
+    "MODEL REF CHECK:",
+    check.status
+  );
+}
+
           const response =
             await axios.post(
 
@@ -419,17 +439,7 @@ const isBackView =
 },
 
 
-...(angle.includes("BACK VIEW") &&
-backImage
-  ? [
-      {
-        fileData: {
-          mimeType: "image/jpeg",
-          fileUri: backImage,
-        },
-      },
-    ]
-  : []),
+
 
                       // PROMPT
 
@@ -483,14 +493,62 @@ const uploadedReference =
     generatedImage
   );
 
+  if (!firstModelReference) {
+  firstModelReference =
+    uploadedReference;
+}
+
 modelReference =
   uploadedReference;
 
-await sleep(8000);
+let ready = false;
+
+for (let i = 0; i < 10; i++) {
+
+  try {
+
+    const test =
+      await axios.head(
+        modelReference
+      );
+
+    if (test.status === 200) {
+
+      ready = true;
+      break;
+
+    }
+
+  } catch {}
+
+  await sleep(3000);
+}
+
+if (!ready) {
+
+  throw new Error(
+    "Model reference not available"
+  );
+
+}
 
 
 }
 
+
+
+
+
+if (
+  angle.includes(
+    "CLOSE-UP PORTRAIT"
+  )
+) {
+
+  modelReference =
+    firstModelReference || modelReference;
+
+}
 
 console.log(
   "MODEL REF:",
