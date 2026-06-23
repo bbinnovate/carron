@@ -286,7 +286,7 @@ const handleUpload = (
   const files =
     Array.from(
       e.target.files || []
-    ).slice(0, 4);
+    ).slice(0, 3);
 
   // FILE SIZE VALIDATION
 
@@ -309,11 +309,11 @@ const handleUpload = (
   }
 
   if (
-    files.length > 4
+    files.length > 3
   ) {
 
     setError(
-      "You can upload maximum 4 images only."
+      "You can upload maximum 3 images only."
     );
 
     return;
@@ -737,6 +737,60 @@ const handleDeleteSelectedProducts =
     }
 };
 
+
+const handleDeleteSelectedSyncedProducts =
+  async () => {
+
+    if (
+      selectedDeleteProducts.length === 0
+    ) {
+      alert(
+        "Please select products first"
+      );
+      return;
+    }
+
+    const confirmDelete =
+      window.confirm(
+        `Are you sure you want to delete ${selectedDeleteProducts.length} synced products?`
+      );
+
+    if (!confirmDelete) return;
+
+    try {
+
+      await Promise.all(
+        selectedDeleteProducts.map(
+          (productId) =>
+            deleteDoc(
+              doc(
+                db,
+                "products",
+                productId
+              )
+            )
+        )
+      );
+
+      await fetchProducts();
+
+      setSelectedDeleteProducts([]);
+
+      alert(
+        "Selected synced products deleted successfully"
+      );
+
+    } catch (error: any) {
+
+      console.log(error);
+
+      alert(
+        error?.message ||
+        "Delete failed"
+      );
+    }
+};
+
   function setSelectedCharacter(image: string): void {
     throw new Error("Function not implemented.");
   }
@@ -834,7 +888,7 @@ const handleDeleteSelectedProducts =
        
       "
     >
-    Upload 4 Front Images
+    Upload 3 Front Images
     </h3>
 
 <p
@@ -1197,7 +1251,7 @@ xl:grid-cols-4
        
       "
     >
-    Upload 4 Front Images
+    Upload 3 Front Images
     </h3>
 
 <p
@@ -2126,28 +2180,49 @@ const paginatedData =
     Description
   </div>
 
-<div className="font-semibold flex justify-end">
+<div className="font-semibold flex justify-end gap-3">
+
   {selectedProducts.length > 0 && (
-    <button
-      onClick={handleBulkShopifySync}
-      disabled={bulkSyncLoading}
-      className="
-        bg-white
-        text-black
-        px-6
-        py-3
-        rounded-[10px]
-        font-semibold
-        hover:opacity-90
-        transition
-        whitespace-nowrap
-      "
-    >
-      {bulkSyncLoading
-        ? "Syncing..."
-        : `Sync (${selectedProducts.length})`}
-    </button>
+    <>
+      <button
+        onClick={handleDeleteSelectedProducts}
+        className="
+          bg-red-600
+          text-white
+          px-6
+          py-3
+          rounded-[10px]
+          font-semibold
+          hover:bg-red-700
+          transition
+          whitespace-nowrap
+        "
+      >
+        Delete ({selectedProducts.length})
+      </button>
+
+      <button
+        onClick={handleBulkShopifySync}
+        disabled={bulkSyncLoading}
+        className="
+          bg-white
+          text-black
+          px-6
+          py-3
+          rounded-[10px]
+          font-semibold
+          hover:opacity-90
+          transition
+          whitespace-nowrap
+        "
+      >
+        {bulkSyncLoading
+          ? "Syncing..."
+          : `Sync (${selectedProducts.length})`}
+      </button>
+    </>
   )}
+
 </div>
 </div>
 
@@ -3172,19 +3247,43 @@ px-4
 
      
 
-      <span
-        className="
-         hidden
-    lg:inline-flex
-          bg-white/20
-          px-4
-          py-1
-          rounded-full
-          text-sm
-        "
-      >
-        {syncedProducts.length} Products
-      </span>
+     <div className="flex items-center gap-3">
+
+  {selectedDeleteProducts.length > 0 && (
+
+    <button
+      onClick={
+        handleDeleteSelectedSyncedProducts
+      }
+      className="
+        bg-red-600
+        text-white
+        px-4
+        py-2
+        rounded-[10px]
+        font-semibold
+        hover:bg-red-700
+        transition
+      "
+    >
+      Delete ({selectedDeleteProducts.length})
+    </button>
+
+  )}
+
+  <span
+    className="
+      bg-white/20
+      px-4
+      py-1
+      rounded-full
+      text-sm
+    "
+  >
+    {syncedProducts.length} Products
+  </span>
+
+</div>
 
        <span
         className="
@@ -3236,6 +3335,42 @@ px-4
                 bg-white
               "
             >
+
+                <input
+    type="checkbox"
+    checked={
+      selectedDeleteProducts.includes(
+        item.id || ""
+      )
+    }
+    onChange={(e) => {
+
+      if (!item.id) return;
+
+      if (e.target.checked) {
+
+        setSelectedDeleteProducts([
+          ...selectedDeleteProducts,
+          item.id,
+        ]);
+
+      } else {
+
+        setSelectedDeleteProducts(
+          selectedDeleteProducts.filter(
+            (id) =>
+              id !== item.id
+          )
+        );
+      }
+    }}
+    className="
+      w-5
+      h-5
+      cursor-pointer
+      accent-red-600
+    "
+  />
 
               {/* SR NO */}
 
