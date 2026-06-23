@@ -1873,7 +1873,7 @@ xl:grid-cols-4
       window.innerWidth < 768;
 
     const itemsPerPage =
-      isMobile ? 5 : 25;
+      isMobile ? 5 : 15;
       
 
 const visibleProducts =
@@ -2305,15 +2305,10 @@ overflow-hidden
   }}
   className="
     w-full
-    max-h-screen
- overflow-y-auto
     overscroll-contain
     overflow-hidden
   
 
-    scrollbar-thin
-    scrollbar-thumb-[var(--highlight)]
-    scrollbar-track-gray-100
  
     
   "
