@@ -2425,7 +2425,7 @@ overflow-hidden
       font-semibold
     "
   >
-    #{index + 1}
+ #{(currentPage - 1) * itemsPerPage + index + 1}
   </span>
 
   {/* {item.syncedToShopify && (
@@ -3246,7 +3246,7 @@ px-4
                   mb-3
                 "
               >
-                #{index + 1}
+                 #{(syncedCurrentPage - 1) * syncedItemsPerPage + index + 1}
               </div>
 
               {/* IMAGES */}
