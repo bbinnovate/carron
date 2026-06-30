@@ -212,7 +212,7 @@ switch (backgroundColor?.toUpperCase()) {
           referenceImage
         );
 
-      let retries = 3;
+      let retries = 5;
 
       while (retries > 0) {
 
@@ -475,7 +475,7 @@ await sleep(2000);
 
             retries--;
 
-            await sleep(3000);
+            await sleep(7000);
 
             continue;
           }
@@ -502,21 +502,17 @@ await sleep(2000);
 ];
 
 
-const expectedCount =
-  backImage ? 4 : 3;
-
-if (
-  images.length < expectedCount
-) {
-  throw new Error(
-    `Expected ${expectedCount} images but got ${images.length}`
-  );
+// Nothing generated
+if (images.length === 0) {
+  throw new Error("No images were generated.");
 }
 
-    return {
-  images: images.slice(
-    0,
-    backImage ? 4 : 3
-  ),
+console.log(
+  `Generated ${images.length} image(s).`
+);
+
+// Return every successfully generated image
+return {
+  images,
 };
 };

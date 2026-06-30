@@ -3301,7 +3301,7 @@ px-4
               "
             >
 
-                <input
+                {/* <input
     type="checkbox"
     checked={
       selectedDeleteProducts.includes(
@@ -3335,7 +3335,7 @@ px-4
       cursor-pointer
       accent-red-600
     "
-  />
+  /> */}
 
               {/* SR NO */}
 

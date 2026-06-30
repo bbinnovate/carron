@@ -160,22 +160,21 @@ export async function POST(
 
       // SAFE CHECK
 
-      if (
-        !nanoResult?.images ||
-        nanoResult.images.length === 0
-      ) {
-
-        return NextResponse.json(
-          {
+      if (!nanoResult?.images?.length) {
+    return NextResponse.json(
+        {
             success: false,
-            message:
-              "No images generated",
-          },
-          {
+            message: "No images generated.",
+        },
+        {
             status: 500,
-          }
-        );
-      }
+        }
+    );
+}
+
+console.log(
+    `Received ${nanoResult.images.length} generated images`
+);
 
       // UPLOAD ALL GENERATED IMAGES
 
