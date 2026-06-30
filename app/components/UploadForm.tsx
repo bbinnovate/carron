@@ -2184,22 +2184,7 @@ const paginatedData =
 
   {selectedProducts.length > 0 && (
     <>
-      <button
-        onClick={handleDeleteSelectedProducts}
-        className="
-          bg-red-600
-          text-white
-          px-6
-          py-3
-          rounded-[10px]
-          font-semibold
-          hover:bg-red-700
-          transition
-          whitespace-nowrap
-        "
-      >
-        Delete ({selectedProducts.length})
-      </button>
+
 
       <button
         onClick={handleBulkShopifySync}
@@ -2361,7 +2346,7 @@ overflow-hidden
         {
           bulkSyncLoading
             ? "Syncing..."
-            : `Sync To Shopify (${selectedProducts.length})`
+            : `Sync (${selectedProducts.length})`
         }
       </button>
 
@@ -3249,27 +3234,7 @@ px-4
 
      <div className="flex items-center gap-3">
 
-  {selectedDeleteProducts.length > 0 && (
 
-    <button
-      onClick={
-        handleDeleteSelectedSyncedProducts
-      }
-      className="
-        bg-red-600
-        text-white
-        px-4
-        py-2
-        rounded-[10px]
-        font-semibold
-        hover:bg-red-700
-        transition
-      "
-    >
-      Delete ({selectedDeleteProducts.length})
-    </button>
-
-  )}
 
   <span
     className="
