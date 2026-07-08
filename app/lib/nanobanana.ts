@@ -211,6 +211,8 @@ switch (backgroundColor?.toUpperCase()) {
 
     // THIS WILL KEEP SAME MODEL
 
+    const originalFrontImagePart = await imageUrlToInlineData(imageUrl);
+
     let referenceImage =
       imageUrl;
 
@@ -410,10 +412,30 @@ CRITICAL:
 - garment identity, length, fit, silhouette, color, material, texture, stitching, print, logo, embroidery, trims, and embellishments are mandatory
 - reject any result that looks like a similar but different product
 
+Do not change:
+- Design
+- Color
+- Pattern
+- Texture
+- Material
+- Stitching
+- Logos
+- Embellishments
+- Shape
+- Fit
+- Garment length
+- Any other product details
 
+PANTS HANDLING:
+If the uploaded product image contains only the upper garment (for example, just a shirt, T-shirt, hoodie, jacket, or top), and no pants are provided, automatically add simple pants that perfectly match the color of the upper garment.
+The generated pants should:
+- Exactly match the color of the upper garment.
+- Be plain and minimal.
+- Not distract from the main product.
+- Match the overall style naturally.
+- Never become the focus of the image.
 
-
-
+The uploaded product should always remain the primary focus.
 `;
 
 
@@ -438,13 +460,9 @@ CRITICAL:
 
                       // REFERENCE IMAGE
 
-                      referenceImagePart,
-
-
-                      ...(backImage &&
-  backImagePart
-  ? [backImagePart]
-  : []),
+                      ...(angle.includes("BACK VIEW") && backImagePart
+                        ? [originalFrontImagePart, backImagePart]
+                        : [referenceImagePart]),
 
                       // PROMPT
 
