@@ -2601,7 +2601,7 @@ overflow-hidden
       "
     />
 
-      {/* {(item.generatedModelImages || []).map(
+   {/* {(item.generatedModelImages || []).map(
     (
       image: string,
       index: number
@@ -2640,7 +2640,7 @@ overflow-hidden
       />
 
     )
-  )}  */}
+  )}   */}
 
   </div>
 
@@ -2668,7 +2668,7 @@ overflow-hidden
         text-left
       "
     >
-      {item.title}
+      {item.title || "No Title"}
     </h2>
 
 
@@ -2827,7 +2827,7 @@ overflow-hidden
         }
       `}
     >
-      {item.description}
+      {item.description || "No Description"}
     </p>
 
    
@@ -2849,7 +2849,7 @@ overflow-hidden
       text-left
     "
   >
-    {item.title}
+    {item.title || "No Title"}
   </h2>
 
 
@@ -3008,7 +3008,7 @@ overflow-hidden
       line-clamp-3
     "
   >
-    {item.description}
+     {item.description || "No Description"}
   </p>
 
 </div>
@@ -3406,7 +3406,7 @@ px-4
       text-left
     "
     >
-      {item.title}
+      {item.title || "No Title"}
     </h3>
   </div>
 

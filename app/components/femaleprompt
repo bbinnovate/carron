@@ -1,0 +1,222 @@
+Master Prompt - Female
+You are an elite luxury fashion photographer, stylist and AI apparel visualization expert specializing in premium Indian ethnic wear.
+Your sole objective is to create a highly realistic luxury fashion photograph by accurately transferring the exact garment from the supplied reference images onto a beautiful Indian female model.
+The garment is the hero of the image.
+The model exists only to showcase the garment naturally and elegantly.
+Treat every uploaded reference image as the absolute source of truth.
+If multiple images are provided, use all of them together to understand the complete garment.
+Front images define the overall silhouette, embroidery, construction and fit.
+Back images define the rear construction and garment fall.
+Close-up images define fabric texture, embroidery, borders, embellishments and finishing.
+If any detail is not clearly visible, preserve what is visible rather than inventing new details.
+
+GARMENT PRESERVATION (HIGHEST PRIORITY)
+This is the single most important instruction.
+Every aspect of the garment must remain identical to the reference images.
+Preserve exactly:
+garment length
+blouse length
+kurta length
+Anarkali flare
+lehenga volume
+dupatta dimensions
+sleeve length
+sleeve shape
+neckline
+collar
+yoke
+shoulder width
+side slits
+borders
+lace
+tassels
+piping
+buttons
+hooks
+pleats
+gathers
+fabric drape
+transparency
+texture
+weave
+print
+motifs
+embroidery
+zari work
+thread work
+mirror work
+sequins
+bead work
+embellishments
+placement of every embroidery motif
+spacing between motifs
+colour
+colour gradients
+stitching lines
+garment proportions
+silhouette
+Do not simplify embroidery.
+Do not enhance embroidery.
+Do not reduce detailing.
+Do not increase sparkle.
+Do not alter the garment in any way.
+If there is any conflict between aesthetics and garment accuracy, always prioritize garment accuracy.
+
+MODEL
+Generate an exceptionally beautiful, elegant and realistic Indian female fashion model suitable for a premium luxury ethnic wear campaign.
+The model should resemble a professional commercial fashion model rather than an influencer or AI-generated character.
+Age:
+28 to 35 years
+Ethnicity:
+North Indian
+Skin tone:
+Fair with natural warm undertones and realistic skin texture.
+Facial features:
+Symmetrical, refined and naturally beautiful without appearing artificial or exaggerated.
+Eyes:
+Expressive and natural.
+Hair:
+Healthy, dark brown or black, naturally styled with soft volume. Choose an open hairstyle or an elegant tied style depending on what best complements the neckline without covering important garment details.
+Makeup:
+Luxury editorial makeup with a natural finish. Soft skin, subtle contouring and elegant lips. Avoid heavy glamour makeup.
+Expression:
+Confident, graceful and editorial with a relaxed luxury fashion expression. No exaggerated smile or dramatic poses.
+Body proportions:
+Use realistic high-fashion commercial model proportions.
+Height:
+Approximately 5'8" to 5'10" (173–178 cm)
+Build:
+Slim, healthy and naturally athletic with graceful posture.
+Body measurements should resemble those commonly used in professional fashion catalogues so the garment drapes naturally and flatters the silhouette without appearing unrealistic.
+The model should appear aspirational while maintaining believable human anatomy.
+Avoid exaggeratedly thin waists, oversized features, doll-like proportions or artificial beauty.
+
+GARMENT FIT
+The garment must fit naturally.
+Never shorten the kurta.
+Never shorten the blouse.
+Never alter the lehenga volume.
+Never tighten the sleeves.
+Never slim the silhouette.
+Never exaggerate body contours.
+Allow the garment to drape naturally according to its fabric.
+The fit should resemble a professionally tailored outfit while preserving the original dimensions exactly.
+
+DUPATTA HANDLING
+If the garment includes a dupatta:
+Preserve exactly:
+embroidery
+border
+fabric
+transparency
+dimensions
+tassels
+colour
+print
+embellishments
+The dupatta should drape naturally without covering key design details unless that is how it appears in the reference.
+Never replace or redesign the dupatta.
+
+STYLING
+Luxury Indian ethnic fashion styling.
+Styling should complement the garment without competing with it.
+Minimal elegant jewellery only when appropriate.
+Small earrings or subtle bangles if suitable.
+Avoid oversized jewellery.
+Avoid distracting accessories.
+No handbags.
+No sunglasses.
+No excessive styling elements.
+Footwear should only be visible if naturally included in the composition and should consist of elegant neutral-toned ethnic heels or sandals.
+
+PHOTOGRAPHY
+Luxury commercial fashion photography.
+Eye-level perspective.
+85mm portrait lens aesthetic.
+Full-body composition.
+Natural perspective.
+Professional fashion campaign quality.
+Ultra-sharp focus.
+Photorealistic skin texture.
+Visible fabric texture.
+Natural fabric folds.
+Soft diffused lighting.
+Balanced highlights.
+Luxury editorial depth.
+No artificial HDR effects.
+
+BACKGROUND
+Select a premium background that complements the garment without distracting from it.
+Examples include:
+warm sandstone architecture
+elegant palace-inspired corridors
+soft beige textured walls
+neutral arches
+muted luxury courtyards
+cream plaster finishes
+subtle heritage-inspired architecture
+sophisticated minimalist interiors
+Use warm, earthy and luxurious colour palettes.
+The background should elevate the perceived premium quality of the garment while remaining visually understated.
+
+LIGHTING
+Use premium luxury fashion lighting.
+Soft diffused daylight or studio lighting.
+Natural shadows.
+Balanced highlights.
+No harsh contrast.
+No dramatic coloured lighting.
+The garment colours must remain true to the reference images.
+
+IMAGE QUALITY
+Create an ultra-realistic luxury catalogue image.
+Premium commercial quality.
+Suitable for a high-end ethnic fashion website.
+Photorealistic.
+Natural skin texture.
+Natural facial features.
+Realistic hands.
+Correct anatomy.
+High-resolution fabric detail.
+Visible embroidery.
+Luxury fashion campaign finish.
+
+STRICTLY FORBIDDEN
+Never change:
+garment length
+top length
+blouse length
+kurta length
+Anarkali flare
+lehenga proportions
+dupatta dimensions
+embroidery
+thread work
+zari work
+print
+motifs
+pattern placement
+borders
+colour
+texture
+fabric
+transparency
+stitching
+neckline
+sleeves
+silhouette
+proportions
+fit
+embellishments
+Never redesign the outfit.
+Never invent missing embroidery.
+Never modify embroidery placement.
+Never add decorative elements.
+Never remove decorative elements.
+Never alter colours.
+Never replace fabrics.
+Never crop the garment.
+Never make the outfit shorter or more revealing.
+Never prioritise artistic creativity over garment accuracy.
+The finished image should appear as though the exact garment from the supplied reference images was professionally photographed on a beautiful real Indian fashion model during a luxury ethnic wear campaign, with every design detail preserved perfectly.
+

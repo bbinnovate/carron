@@ -1,4 +1,6 @@
 import axios from "axios";
+import path from "path";
+import fs from "fs";
 
 import { uploadBase64Image }
 from "./uploadBase64";
@@ -62,16 +64,26 @@ const imageUrlToInlineData =
     };
   };
 
-export const generateModelImage =
-  async (
-    prompt: string,
-    gender: string,
-    imageUrl: string,
-    backImage: string,
-    backgroundColor: any,
-    backgroundType: string,
-    backgroundImage: string
-  ) => {
+export const generateModelImage = async (
+  gender: string,
+  imageUrl: string,
+  backImage: string,
+  backgroundColor: any,
+  backgroundType: string,
+  backgroundImage: string,
+  text: string
+) => {
+    let basePrompt = "";
+    try {
+      if (gender?.toLowerCase() === "male") {
+        basePrompt = fs.readFileSync(path.join(process.cwd(), "app", "components", "maleprompt"), "utf-8");
+      } else {
+        basePrompt = fs.readFileSync(path.join(process.cwd(), "app", "components", "femaleprompt"), "utf-8");
+      }
+    } catch (e) {
+      console.log("Error reading prompt files", e);
+      basePrompt = "Follow the uploaded product reference images exactly.";
+    }
 
     const angles = [
   `
@@ -81,6 +93,8 @@ export const generateModelImage =
   both shoulders visible,
   standing straight,
   full body visible,
+  exact front garment length visible from neckline to hem,
+  exact sleeve length and hemline position preserved,
   ecommerce catalog front angle
   `,
 
@@ -89,7 +103,8 @@ export const generateModelImage =
   model walking naturally toward camera,
   one leg forward,
   realistic fashion runway movement, 
-  dynamic kurta flow,
+  natural garment movement without changing length or silhouette,
+  exact hemline remains at the same body landmark as reference,
   full body visible,
   premium ecommerce fashion photography,
   3/4 body angle,
@@ -101,8 +116,10 @@ export const generateModelImage =
   upper body close-up shot,
   chest to head visible,
   detailed embroidery focus,
+  exact neckline, collar, placket, shoulder seams, sleeve opening, print scale, stitching, texture, and embellishments preserved,
   luxury fashion campaign framing,
   sharp facial details,
+  natural skin pores and realistic facial features,
   premium ethnic fashion photography,
   detailed fabric texture visible
   `,
@@ -132,6 +149,10 @@ GARMENT ACCURACY:
 - reproduce exact rear garment structure
 - reproduce exact rear silhouette
 - reproduce exact rear color placement
+- reproduce exact rear garment length
+- reproduce exact rear hemline position
+- reproduce exact rear sleeve length
+- reproduce exact rear seam, border, slit, panel, logo, print, trim, and embellishment placement
 
 DO NOT:
 - invent any rear design
@@ -139,6 +160,8 @@ DO NOT:
 - use front design on rear side
 - generate a different back pattern
 - modify rear garment details
+- lengthen or shorten the garment
+- move the hemline, sleeve ends, print, embroidery, border, seams, slits, or trims
 
 POSE:
 - standing straight
@@ -146,6 +169,7 @@ POSE:
 - full body visible
 - head to toe visible
 - centered composition
+- exact garment length and proportions clearly visible
 
 OUTPUT:
 - premium ecommerce catalog photography
@@ -235,6 +259,7 @@ Scene:
 - minimal premium ethnicwear studio setup
 - soft diffused lighting
 - realistic commercial fashion photography
+- high-end fashion campaign lighting with natural skin tones
 - clean luxury ecommerce environment
 - plain elegant background
 - smooth seamless floor transition
@@ -265,6 +290,8 @@ Scene:
 - no gradients
 - no texture
 - flat studio catalog background
+- premium commercial studio lighting
+- natural realistic skin tones
 `;
 
 }
@@ -292,6 +319,11 @@ Scene:
 - preserve EXACT neckline
 - preserve EXACT fabric texture
 - preserve EXACT outfit proportions
+- preserve EXACT clothing length
+- preserve EXACT hemline position
+- preserve EXACT sleeve length
+- preserve EXACT fit and silhouette
+- preserve EXACT print, logo, border, seam, slit, button, trim, and embellishment placement
 - outfit consistency is mandatory
 
 `;
@@ -299,18 +331,27 @@ Scene:
 }
 
           const enhancedPrompt = `
+${basePrompt}
 
-Create ONE flat catalog fashion image.
+Use this product analysis as a binding product description:
+${text || "Follow the uploaded product reference images exactly."}
 
 IMPORTANT:
 - 5:6 portrait ratio
 - vertical fashion catalog framing
 - full body centered composition
-- preserve EXACT clothing design
-- preserve EXACT colors
-- preserve EXACT embroidery
-- preserve EXACT fashion details
-- DO NOT change the outfit
+- generate a realistic ${gender || "fashion"} model who looks like a real person in a professional photoshoot
+- natural skin texture, visible pores, realistic facial features, accurate hands, accurate feet, correct fingers, realistic body proportions
+- high-end ecommerce and fashion campaign quality, sharp garment details, realistic fabric behavior, natural posture
+- preserve EXACT clothing design from the uploaded product reference
+- preserve EXACT garment type and category
+- preserve EXACT garment length, including top length, dress length, pant length, sleeve length, hemline position, inseam, rise, neckline depth, shoulder width, cuff position, and overall proportions
+- preserve EXACT fit, drape, silhouette, flare, taper, looseness/tightness, waistband placement, slit height, panel shape, and fabric fall
+- preserve EXACT colors, color blocking, shade, saturation, contrast, and material finish
+- preserve EXACT embroidery, prints, logos, labels, borders, trims, buttons, plackets, pockets, pleats, seams, stitching, embellishments, hardware, texture, weave, sheen, opacity, and pattern scale
+- DO NOT change, redesign, recolor, simplify, stylize, crop, lengthen, shorten, widen, tighten, loosen, replace, or accessorize the outfit
+- DO NOT move embroidery, prints, logos, borders, hems, seams, buttons, trims, pockets, slits, pleats, or embellishments
+- the generated garment must look like the same physical product from the uploaded image, photographed on a model
 - each generated image MUST use a completely different camera angle
 - do NOT repeat same body posture
 - do NOT repeat same framing
@@ -321,6 +362,8 @@ IMPORTANT:
 - same face in all images
 - same hairstyle in all images
 - same human in all generations
+- realistic human anatomy in all generations
+- no plastic skin, no doll face, no CGI look, no mannequin, no waxy skin, no distorted hands, no extra fingers, no warped limbs
 
 - First reference image is FRONT VIEW of the garment
 - Second reference image is BACK VIEW of the garment
@@ -331,6 +374,10 @@ IMPORTANT:
 - Preserve rear stitching exactly
 - Preserve rear neckline exactly
 - Preserve rear fabric folds exactly
+- Preserve exact garment length from all visible references
+- Preserve exact front and rear hemline position
+- Preserve exact sleeve length and cuff position
+- Preserve exact silhouette, fit, drape, and proportions
 - Never invent the back side
 - Back side must match uploaded back reference image
 
@@ -342,6 +389,8 @@ Framing:
 - head to toe visible
 - centered model
 - portrait composition
+- leave enough space around head and feet so the garment is not cropped
+- garment length must be readable in the frame
 
 ${backgroundPrompt}
 
@@ -357,6 +406,9 @@ CRITICAL:
 - DO NOT generate different humans
 - background consistency is mandatory
 - preserve same environment across all outputs
+- uploaded product is mandatory source of truth
+- garment identity, length, fit, silhouette, color, material, texture, stitching, print, logo, embroidery, trims, and embellishments are mandatory
+- reject any result that looks like a similar but different product
 
 
 
@@ -365,12 +417,10 @@ CRITICAL:
 `;
 
 
- 
-
           const response =
             await axios.post(
 
-              `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${process.env.NANO_BANANA_API_KEY}`,
+              `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${process.env.NANO_BANANA_API_KEY}`,
 
               {
                 contents: [

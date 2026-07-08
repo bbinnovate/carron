@@ -1,11 +1,11 @@
 import { NextResponse }
 from "next/server";
 
-import { analyzeProduct }
-from "../../lib/claude";
 
 import { generateModelImage }
 from "../../lib/nanobanana";
+import { analyzeProduct }
+from "../../lib/claude";
 
 import { uploadBase64Image }
 from "../../lib/uploadBase64";
@@ -41,6 +41,7 @@ export async function POST(
       backgroundColor,
       backgroundType,
       backgroundImage,
+      text,
     } = body;
 
     // VALIDATION
@@ -62,77 +63,7 @@ export async function POST(
       );
     }
 
-    // CLAUDE ANALYSIS
 
-    const result =
-      await analyzeProduct(
-        imageUrls[0]
-      );
-
-    // RAW CLAUDE TEXT
-
-    const text =
-      result?.content?.[0]?.text || "";
-
-    console.log(
-      "RAW CLAUDE RESPONSE:",
-      text
-    );
-
-    // EXTRACT JSON
-
-    const jsonMatch =
-      text.match(/\{[\s\S]*\}/);
-
-    if (!jsonMatch) {
-
-      return NextResponse.json(
-        {
-          success: false,
-          message:
-            "No valid JSON found from Claude",
-        },
-        {
-          status: 500,
-        }
-      );
-    }
-
-    const cleaned =
-      jsonMatch[0];
-
-    // PARSE JSON
-
-    let parsed: any;
-
-    try {
-
-      parsed =
-        JSON.parse(cleaned);
-
-    } catch (parseError) {
-
-      console.log(
-        "JSON PARSE ERROR:",
-        cleaned
-      );
-
-      return NextResponse.json(
-        {
-          success: false,
-          message:
-            "Claude returned invalid JSON",
-        },
-        {
-          status: 500,
-        }
-      );
-    }
-
-    console.log(
-      "PARSED DATA:",
-      parsed
-    );
 
     // GENERATE MODEL IMAGE
 
@@ -144,13 +75,13 @@ export async function POST(
 
       nanoResult =
         await generateModelImage(
-          parsed.imagePrompt,
           gender,
           imageUrls[0],
-           backImage,
+          backImage,
           backgroundColor,
           backgroundType,
-          backgroundImage
+          backgroundImage,
+          text,
         );
 
       console.log(
@@ -227,6 +158,20 @@ console.log(
 
     // FINAL DATA
 
+    let productContent: any = null;
+    try {
+      if (imageUrls && imageUrls.length > 0) {
+         productContent = await analyzeProduct(imageUrls[0]);
+         if (typeof productContent === "string") {
+            try {
+              productContent = JSON.parse(productContent);
+            } catch(e){}
+         }
+      }
+    } catch(err) {
+      console.log("Claude analysis failed", err);
+    }
+
     const finalData = {
 
       uploadedProductImages:
@@ -238,20 +183,11 @@ console.log(
          backImage:
     backImage || "",
 
-      imagePrompt:
-        parsed?.imagePrompt || "",
-
-      title:
-        parsed?.title || "",
-
-      description:
-        parsed?.description || "",
-
-      metaTitle:
-        parsed?.metaTitle || "",
-
-      metaDescription:
-        parsed?.metaDescription || "",
+      imagePrompt: "",
+title: productContent?.title || "",
+description: productContent?.description || "",
+metaTitle: productContent?.metaTitle || "",
+metaDescription: productContent?.metaDescription || "",
 
       gender,
 
@@ -308,3 +244,72 @@ console.log(
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

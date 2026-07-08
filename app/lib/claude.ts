@@ -34,75 +34,19 @@ export const analyzeProduct =
                     type: "text",
 
                  text: `
-You are a JSON API.
+You are a strict JSON API. Your entire response must be one valid JSON object. The first character must be { and the last character must be }. Do not write markdown, code fences, comments, explanations, or any text outside the JSON object.
 
-CRITICAL RULES:
-- Return ONLY valid raw JSON
-- No markdown
-- No explanation
-- No \`\`\`
-- No extra text
-- No comments
+Analyze the uploaded fashion product image as the source of truth. Identify the exact product type, colors, material, texture, pattern, print, embroidery, logo, trims, stitching, seams, buttons, closures, neckline, collar, sleeves, cuffs, waist, hemline, garment length, fit, silhouette, drape, proportions, and every visible construction detail. 
 
-Analyze the uploaded fashion product image carefully.
+Return exactly these JSON keys as strings: "title", "description", "metaTitle", "metaDescription".
 
-Detect:
-- product type
-- age category
-- colors
-- fabric details
-- design elements
-- patterns
-- embroidery
-- neckline
-- sleeves
+The title should be a catchy SEO-friendly product title.
+The description should be a detailed product description for an e-commerce page.
+The metaTitle should be an SEO meta title.
+The metaDescription should be an SEO meta description.
 
-Generate:
-- title
-- ecommerce description
-- meta title
-- meta description
-- realistic AI fashion photoshoot prompts for 4 angles
-
-IMPORTANT: Each prompt must generate a SEPARATE image. Do NOT reuse or modify the same image 4 times.
-
-Generate 4 DIFFERENT angle prompts for ECOMMERCE PRODUCT PHOTOGRAPHY:
-
-1. FRONT ANGLE:
-Professional Indian fashion model, full-body shot head to toe, PURE WHITE BACKGROUND (absolutely plain white, no texture, no shadows), wearing [exact product details], facing camera directly, arms at sides, professional studio lighting, sharp focus. PRESERVE: exact colors, exact design, exact embroidery. CRITICAL: White background ONLY, no gradient, no studio elements.
-
-2. RIGHT ANGLE:
-Professional Indian fashion model, full-body shot head to toe, PURE WHITE BACKGROUND (absolutely plain white, no texture, no shadows), wearing [exact product details], standing in right profile (right side facing camera), professional studio lighting, sharp focus. PRESERVE: exact colors, exact design, exact embroidery. CRITICAL: White background ONLY, no gradient, no studio elements.
-
-3. LEFT ANGLE:
-Professional Indian fashion model, full-body shot head to toe, PURE WHITE BACKGROUND (absolutely plain white, no texture, no shadows), wearing [exact product details], standing in left profile (left side facing camera), professional studio lighting, sharp focus. PRESERVE: exact colors, exact design, exact embroidery. CRITICAL: White background ONLY, no gradient, no studio elements.
-
-4. BACK ANGLE:
-Profession
-al Indian fashion model, full-body shot head to toe, PURE WHITE BACKGROUND (absolutely plain white, no texture, no shadows), wearing [exact product details], standing with back to camera (facing away), back of garment fully visible, professional studio lighting, sharp focus. PRESERVE: exact colors, exact design, exact embroidery. CRITICAL: White background ONLY, no gradient, no studio elements. Show complete back view.
-
-DO NOT:
-- Add gradients to background
-- Add shadows
-- Add studio props or furniture
-- Change colors
-- Modify design
-- Change clothing
-- Add accessories
-- Add effects or filters
-
-Return EXACTLY this JSON structure:
-
-{
-  "title": "",
-  "description": "",
-  "metaTitle": "",
-  "metaDescription": "",
-  "imagePromptFront": "Professional Indian fashion model, full-body head to toe, pure white background, [product details], front facing, arms at sides, white studio lighting, sharp focus, ecommerce photography",
-  "imagePromptRight": "Professional Indian fashion model, full-body head to toe, pure white background, [product details], right profile view, white studio lighting, sharp focus, ecommerce photography",
-  "imagePromptLeft": "Professional Indian fashion model, full-body head to toe, pure white background, [product details], left profile view, white studio lighting, sharp focus, ecommerce photography",
-  "imagePromptBack": "Professional Indian fashion model, full-body head to toe, pure white background, [product details], back facing away, back of garment fully visible, white studio lighting, sharp focus, ecommerce photography"
-}
+Return only this JSON object shape, filled with real values:
+{"title":"","description":"","metaTitle":"","metaDescription":""}
 `,
                   },
                 ],
@@ -124,7 +68,8 @@ Return EXACTLY this JSON structure:
           }
         );
 
-      return response.data;
+      const rawText = response.data?.content?.[0]?.text || "{}";
+      return JSON.parse(rawText);
 
     } catch (error: any) {
 
