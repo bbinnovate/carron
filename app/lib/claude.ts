@@ -33,7 +33,7 @@ export const analyzeProduct =
                   {
                     type: "text",
 
-                 text: `
+                                  text: `
 You are a strict JSON API. Your entire response must be one valid JSON object. The first character must be { and the last character must be }. Do not write markdown, code fences, comments, explanations, or any text outside the JSON object.
 
 Analyze the uploaded fashion product image as the source of truth. Identify the exact product type, colors, material, texture, pattern, print, embroidery, logo, trims, stitching, seams, buttons, closures, neckline, collar, sleeves, cuffs, waist, hemline, garment length, fit, silhouette, drape, proportions, and every visible construction detail. 

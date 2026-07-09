@@ -253,27 +253,21 @@ if (
 
 backgroundPrompt = `
 
-Scene:
-- luxury seamless studio backdrop
-- warm neutral beige gray background
-- soft matte studio wall
-- subtle natural floor shadow
-- minimal premium ethnicwear studio setup
-- soft diffused lighting
-- realistic commercial fashion photography
-- high-end fashion campaign lighting with natural skin tones
-- clean luxury ecommerce environment
-- plain elegant background
-- smooth seamless floor transition
-- no props
-- no furniture
-- no decorative elements
-- no gradients
-- no text
-- no watermark
-- same exact background in all images
-- same lighting setup in all images
-- same environment consistency
+BACKGROUND
+==================================================
+
+Choose a premium background that complements but never overpowers the outfit.
+
+Examples:
+warm sandstone
+soft beige textured wall
+minimal palace architecture
+neutral arches
+modern luxury courtyard
+soft cream backdrop
+subtle architectural depth
+Muted earthy tones only.
+The background should increase the perceived luxury of the garment.
 
 `;
 
