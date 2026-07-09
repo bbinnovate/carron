@@ -2186,7 +2186,7 @@ const paginatedData =
     <>
 
 
-    <button
+    {/* <button
         onClick={handleDeleteSelectedProducts}
         className="
           bg-red-600
@@ -2201,7 +2201,7 @@ const paginatedData =
         "
       >
         Delete ({selectedProducts.length})
-      </button>
+      </button> */}
 
 
 
@@ -2865,7 +2865,7 @@ overflow-hidden
         }
       `}
     >
-      {item.description || "No Description"}
+     {(item.description || "No Description").replace(/<[^>]*>/g, "")}
     </p>
    
 
@@ -3046,7 +3046,8 @@ overflow-hidden
      
     "
   >
-     {item.description || "No Description"}
+          {(item.description || "No Description").replace(/<[^>]*>/g, "")}
+
   </p>
 
 </div>

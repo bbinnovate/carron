@@ -18,7 +18,33 @@ Analyze the uploaded fashion product image as the source of truth. Identify the 
 Return exactly these JSON keys as strings: "title", "description", "metaTitle", "metaDescription".
 
 The title should be a catchy SEO-friendly product title.
-The description should be a detailed product description for an e-commerce page.
+The description must be highly detailed and returned as a single raw HTML string without any markdown fences. Follow this exact HTML structure, adapting the text to match the uploaded product to ensure a clean, professional layout in Shopify:
+
+<h3>Product Overview</h3>
+<p>[Write an elegant, engaging paragraph describing the ensemble, its pieces, and colors here.]</p>
+<p>[Write a second paragraph discussing the aesthetic and vibe, keeping spacing clean.]</p>
+
+<h3>Design &amp; Craftsmanship Details</h3>
+<ul>
+  <li><strong>Silhouette:</strong> [Describe the cut and layers here.]</li>
+  <li><strong>The Jacket:</strong> [Describe jacket specifics here.]</li>
+  <li><strong>Collar:</strong> [Describe the collar here, if applicable.]</li>
+  <li><strong>Front &amp; Sleeves:</strong> [Describe embroidery, motifs, and colors here.]</li>
+  <li><strong>The Kurta &amp; Trousers:</strong> [Describe the inner garments here.]</li>
+</ul>
+
+<h3>Fabric &amp; Comfort</h3>
+<p><strong>Material:</strong> [Describe the fabric blend here.]</p>
+<p><strong>Comfort:</strong> [Describe the weave, drape, and visual texture here.]</p>
+
+<h3>Style</h3>
+<p>[Write 2 to 3 sentences about the styling, matching accessories, and the occasions this is for.]</p>
+
+<h3>Care Instructions</h3>
+<ul>
+  <li><strong>Washing:</strong> [Provide washing instruction.]</li>
+  <li><strong>Ironing:</strong> [Provide ironing instruction.]</li>
+</ul>
 The metaTitle should be an SEO meta title.
 The metaDescription should be an SEO meta description.
 
